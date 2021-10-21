@@ -6,7 +6,7 @@ import { BaseEntity, Column, Entity, PrimaryGeneratedColumn } from "typeorm";
 export class Role extends BaseEntity {
   @Field()
   @PrimaryGeneratedColumn()
-  id!: 1;
+  id!: number;
 
   @Field()
   @Column()

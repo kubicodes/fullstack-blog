@@ -4,13 +4,14 @@ import cors from "cors";
 import "dotenv-safe/config";
 import express from "express";
 import session from "express-session";
-import { buildSchema } from "graphql";
+import { buildSchema } from "type-graphql";
 import Redis from "ioredis";
 import path from "path";
 import { createConnection } from "typeorm";
 import { COOKIE_NAME, __prod__ } from "./constants";
 import { Role } from "./entities/Role";
 import { User } from "./entities/User";
+import { RoleResolver } from "./resolvers/role/role";
 
 const main = async () => {
   const connection = await createConnection({
@@ -58,6 +59,24 @@ const main = async () => {
       resave: false,
     })
   );
+
+  const apolloServer = new ApolloServer({
+    schema: await buildSchema({
+      resolvers: [RoleResolver],
+      validate: false
+    }),
+    context: ({ req, res }) => ({
+      req,
+      res,
+      redis,
+    }),
+  });
+
+  await apolloServer.start();
+  /**
+   * Create a GraphQl Endpoint on Express
+   */
+  apolloServer.applyMiddleware({ app, cors: false });
 
   app.listen(process.env.PORT, () => {
     console.log(`Server started on port ${process.env.PORT}`);
