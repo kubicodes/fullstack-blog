@@ -1,12 +1,16 @@
+import { ApolloServer } from "apollo-server-express";
 import connectRedis from "connect-redis";
 import cors from "cors";
 import "dotenv-safe/config";
 import express from "express";
 import session from "express-session";
+import { buildSchema } from "graphql";
 import Redis from "ioredis";
 import path from "path";
 import { createConnection } from "typeorm";
 import { COOKIE_NAME, __prod__ } from "./constants";
+import { Role } from "./entities/Role";
+import { User } from "./entities/User";
 
 const main = async () => {
   const connection = await createConnection({
@@ -17,9 +21,12 @@ const main = async () => {
     password: process.env.DATABASE_PASSWORD,
     database: process.env.DATABASE_NAME,
     logging: true,
-    synchronize: true,
+    synchronize: false,
+    entities: [User, Role],
     migrations: [path.join(__dirname, "./migrations/*")],
   });
+
+  await connection.runMigrations();
 
   const app = express();
 

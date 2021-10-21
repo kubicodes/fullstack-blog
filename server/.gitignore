@@ -122,3 +122,6 @@ dist
 
 #Mac
 .DS_Store
+
+#ormconfig
+ormconfig.json

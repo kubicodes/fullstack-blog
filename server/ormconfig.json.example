@@ -1,0 +1,10 @@
+{
+    "type":
+    "host": 
+    "port":
+    "username":
+    "password":
+    "database":
+    "entities": ["dist/entities/*.js"],
+    "migrations": ["dist/migrations/*.js"]
+}
