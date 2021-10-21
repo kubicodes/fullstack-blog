@@ -1,7 +1,4 @@
-import {
-  Arg, Mutation, Query,
-  Resolver
-} from "type-graphql";
+import { Arg, Mutation, Query, Resolver } from "type-graphql";
 import { Role } from "../../entities/Role";
 import { RoleResponse } from "./types/RoleResponse";
 
@@ -21,7 +18,7 @@ export class RoleResolver {
   async createRole(@Arg("title") title: string): Promise<RoleResponse> {
     try {
       const createdRole = await Role.create({ title }).save();
-      return { roles: createdRole };
+      return { roles: [createdRole] };
     } catch (error) {
       return { errors: { message: error.message } };
     }
