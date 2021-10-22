@@ -3,9 +3,9 @@ import { Role } from "../../../entities/Role";
 import { FieldError } from "./FieldError";
 
 @ObjectType()
-export class RoleResponse {
-  @Field(() => [Role], { nullable: true })
-  roles?: Role[];
+export class SingleRoleResponse {
+  @Field(() => Role, { nullable: true })
+  role?: Role;
 
   @Field(() => [FieldError], { nullable: true })
   errors?: [FieldError];

@@ -9,6 +9,6 @@ export class Role extends BaseEntity {
   id!: number;
 
   @Field()
-  @Column()
+  @Column({ unique: true })
   title!: string;
 }
