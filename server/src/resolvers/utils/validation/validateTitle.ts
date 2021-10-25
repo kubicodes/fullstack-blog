@@ -1,4 +1,4 @@
-import { SingleRoleResponse } from "../../role/types/SingleRoleResponse";
+import { SingleRoleResponse } from "../../types/SingleRoleResponse";
 
 export const validateTitle = (
   title: string,

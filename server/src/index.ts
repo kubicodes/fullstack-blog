@@ -12,6 +12,7 @@ import { COOKIE_NAME, __prod__ } from "./constants";
 import { Role } from "./entities/Role";
 import { User } from "./entities/User";
 import { RoleResolver } from "./resolvers/role/role";
+import { UserResolver } from "./resolvers/user/user";
 
 const main = async () => {
   const connection = await createConnection({
@@ -62,8 +63,8 @@ const main = async () => {
 
   const apolloServer = new ApolloServer({
     schema: await buildSchema({
-      resolvers: [RoleResolver],
-      validate: false
+      resolvers: [RoleResolver, UserResolver],
+      validate: false,
     }),
     context: ({ req, res }) => ({
       req,

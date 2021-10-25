@@ -1,8 +1,8 @@
 import { Arg, Mutation, Query, Resolver } from "type-graphql";
 import { Role } from "../../entities/Role";
 import { validateTitle } from "../utils/validation/validateTitle";
-import { RoleResponse } from "./types/RoleResponse";
-import { SingleRoleResponse } from "./types/SingleRoleResponse";
+import { RoleResponse } from "../types/RoleResponse";
+import { SingleRoleResponse } from "../types/SingleRoleResponse";
 
 @Resolver(Role)
 export class RoleResolver {
