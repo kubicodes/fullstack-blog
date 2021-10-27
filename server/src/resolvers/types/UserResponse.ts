@@ -1,27 +1,12 @@
-import { Field, Int, ObjectType } from "type-graphql";
+import { Field, ObjectType } from "type-graphql";
 import { FieldError } from "./FieldError";
-import { SingleRoleResponse } from "./SingleRoleResponse";
+import { User } from "./User";
 
 @ObjectType()
 export class UserResponse {
-  @Field(() => Int)
-  id!: number;
+  @Field(() => [User], { nullable: true })
+  users?: User[];
 
-  @Field()
-  username!: string;
-
-  @Field()
-  email!: string;
-
-  @Field(() => SingleRoleResponse)
-  role!: SingleRoleResponse;
-
-  @Field()
-  createdAt!: Date;
-
-  @Field()
-  updatedAt!: Date;
-
-  @Field(() => [FieldError])
-  errors?: [FieldError];
+  @Field(() => [FieldError], { nullable: true })
+  errors?: FieldError[];
 }
