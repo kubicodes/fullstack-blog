@@ -3,17 +3,42 @@ import { FormControl, FormLabel } from "@chakra-ui/react";
 import { Box, Flex, Heading } from "@chakra-ui/react";
 import { Input } from "@chakra-ui/react";
 import { Field, Form, Formik } from "formik";
+import { useRouter } from "next/dist/client/router";
 import React from "react";
 import { Wrapper } from "../components/Wrapper";
+import { useRegisterMutation, useRolesQuery } from "../generated/graphql";
+import { errorMap } from "../utils/errorMap";
+import { withApollo } from "../utils/withApollo";
 
 const Login = () => {
+  const [register] = useRegisterMutation();
+  const { data: rolesData } = useRolesQuery();
+  const router = useRouter();
   return (
     <Wrapper>
       <Formik
         initialValues={{ email: "", username: "", password: "" }}
-        onSubmit={async (values) => {
-          await new Promise((r) => setTimeout(r, 500));
-          alert(JSON.stringify(values, null, 2));
+        onSubmit={async (values, { setErrors }) => {
+          const authorRole = rolesData?.roles.roles.find(
+            (role) => role.title === "author"
+          );
+          const response = await register({
+            variables: {
+              role: authorRole.id,
+              email: values.email,
+              username: values.username,
+              password: values.password,
+            },
+          });
+
+          if (response.data?.register.errors) {
+            const formikFormattedErrors = errorMap(
+              response.data.register.errors
+            );
+            setErrors(formikFormattedErrors);
+          } else {
+            router.push("/");
+          }
         }}
       >
         {({ isSubmitting }) => (
@@ -32,7 +57,7 @@ const Login = () => {
                 <Box my={4} textAlign="left">
                   <Field name="email">
                     {({ field, form }) => (
-                      <FormControl isRequired>
+                      <FormControl isRequired isInvalid={!!form.errors.email}>
                         <FormLabel> Email </FormLabel>
                         <Input
                           {...field}
@@ -41,13 +66,21 @@ const Login = () => {
                           placeholder="Email"
                           size="lg"
                         />
-                        <FormErrorMessage>{form.errors.email}</FormErrorMessage>
+                        {form.errors.email ? (
+                          <FormErrorMessage>
+                            {form.errors.email}
+                          </FormErrorMessage>
+                        ) : null}
                       </FormControl>
                     )}
                   </Field>
                   <Field name="username">
                     {({ field, form }) => (
-                      <FormControl isRequired mt={6}>
+                      <FormControl
+                        isRequired
+                        isInvalid={!!form.errors.username}
+                        mt={6}
+                      >
                         <FormLabel> Username </FormLabel>
                         <Input
                           {...field}
@@ -56,15 +89,21 @@ const Login = () => {
                           placeholder="Username"
                           size="lg"
                         />
-                        <FormErrorMessage>
-                          {form.errors.username}
-                        </FormErrorMessage>
+                        {form.errors.username ? (
+                          <FormErrorMessage>
+                            {form.errors.username}
+                          </FormErrorMessage>
+                        ) : null}
                       </FormControl>
                     )}
                   </Field>
                   <Field name="password">
                     {({ field, form }) => (
-                      <FormControl isRequired mt={6}>
+                      <FormControl
+                        isRequired
+                        isInvalid={!!form.errors.password}
+                        mt={6}
+                      >
                         <FormLabel> Password </FormLabel>
                         <Input
                           {...field}
@@ -72,9 +111,11 @@ const Login = () => {
                           name="password"
                           placeholder="Password"
                         />
-                        <FormErrorMessage>
-                          {form.errors.password}
-                        </FormErrorMessage>
+                        {form.errors.password ? (
+                          <FormErrorMessage>
+                            {form.errors.password}
+                          </FormErrorMessage>
+                        ) : null}
                       </FormControl>
                     )}
                   </Field>
@@ -97,4 +138,4 @@ const Login = () => {
   );
 };
 
-export default Login;
+export default withApollo({ ssr: false })(Login);

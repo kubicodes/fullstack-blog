@@ -1,0 +1,12 @@
+query Roles {
+  roles {
+    roles {
+      id
+      title
+    }
+    errors {
+      field
+      message
+    }
+  }
+}

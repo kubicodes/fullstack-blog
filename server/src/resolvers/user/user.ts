@@ -1,4 +1,4 @@
-import { Arg, Ctx, Mutation, Resolver } from "type-graphql";
+import { Arg, Ctx, Int, Mutation, Resolver } from "type-graphql";
 import { User } from "../../entities/User";
 import { CustomContext } from "../types/CustomContext";
 import { UserResponse } from "../types/UserResponse";
@@ -8,6 +8,7 @@ import { isEmailValid } from "../utils/validation/validateEmail";
 import { isPasswordValid } from "../utils/validation/validatePassword";
 import { LoginOptions } from "../types/LoginOptions";
 import { COOKIE_NAME } from "../../constants";
+import { capitalizeFirstLetter } from "../utils/capitalizeFirstLetter";
 
 @Resolver(User)
 export class UserResolver {
@@ -16,7 +17,7 @@ export class UserResolver {
     @Arg("username") username: string,
     @Arg("email") email: string,
     @Arg("password") password: string,
-    @Arg("role") roleId: number,
+    @Arg("role", () => Int) roleId: number,
     @Ctx() { req }: CustomContext
   ): Promise<UserResponse> {
     if (!isEmailValid(email)) {
@@ -49,12 +50,31 @@ export class UserResolver {
         errors: [{ message: "Internal Server Error. Try again later" }],
       };
     }
-    const createdUser = await User.create({
-      username,
-      email,
-      password: hashedPassword,
-      role_id: roleId,
-    }).save();
+
+    let createdUser;
+    try {
+      createdUser = await User.create({
+        username,
+        email,
+        password: hashedPassword,
+        role_id: roleId,
+      }).save();
+    } catch (error) {
+      if (error.code === "ER_DUP_ENTRY") {
+        let errorField = "";
+        error.sqlMessage.includes("@")
+          ? (errorField = "email")
+          : (errorField = "username");
+        return {
+          errors: [
+            {
+              field: errorField,
+              message: `${capitalizeFirstLetter(errorField)} already exists`,
+            },
+          ],
+        };
+      }
+    }
 
     if (!createdUser) {
       return {
