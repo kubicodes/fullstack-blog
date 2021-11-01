@@ -1,45 +1,44 @@
-import { Button, FormErrorMessage } from "@chakra-ui/react";
-import { FormControl, FormLabel } from "@chakra-ui/react";
-import { Box, Flex, Heading } from "@chakra-ui/react";
-import { Input } from "@chakra-ui/react";
-import { Field, Form, Formik } from "formik";
+import { Box, Button, Flex, Heading } from "@chakra-ui/react";
+import { Form, Formik } from "formik";
 import { useRouter } from "next/dist/client/router";
 import React from "react";
+import InputField from "../components/InputField";
 import { Wrapper } from "../components/Wrapper";
 import { useRegisterMutation, useRolesQuery } from "../generated/graphql";
 import { errorMap } from "../utils/errorMap";
 import { withApollo } from "../utils/withApollo";
 
-const Login = () => {
+const Register = () => {
   const [register] = useRegisterMutation();
   const { data: rolesData } = useRolesQuery();
   const router = useRouter();
+
+  const handleSubmit = async (values, { setErrors }) => {
+    const authorRole = rolesData?.roles.roles.find(
+      (role) => role.title === "author"
+    );
+    const response = await register({
+      variables: {
+        role: authorRole.id,
+        email: values.email,
+        username: values.username,
+        password: values.password,
+      },
+    });
+
+    if (response.data?.register.errors) {
+      const formikFormattedErrors = errorMap(response.data.register.errors);
+      setErrors(formikFormattedErrors);
+    } else {
+      router.push("/");
+    }
+  };
+
   return (
     <Wrapper>
       <Formik
         initialValues={{ email: "", username: "", password: "" }}
-        onSubmit={async (values, { setErrors }) => {
-          const authorRole = rolesData?.roles.roles.find(
-            (role) => role.title === "author"
-          );
-          const response = await register({
-            variables: {
-              role: authorRole.id,
-              email: values.email,
-              username: values.username,
-              password: values.password,
-            },
-          });
-
-          if (response.data?.register.errors) {
-            const formikFormattedErrors = errorMap(
-              response.data.register.errors
-            );
-            setErrors(formikFormattedErrors);
-          } else {
-            router.push("/");
-          }
-        }}
+        onSubmit={handleSubmit}
       >
         {({ isSubmitting }) => (
           <Form>
@@ -55,70 +54,27 @@ const Login = () => {
                   <Heading> Login </Heading>
                 </Box>
                 <Box my={4} textAlign="left">
-                  <Field name="email">
-                    {({ field, form }) => (
-                      <FormControl isRequired isInvalid={!!form.errors.email}>
-                        <FormLabel> Email </FormLabel>
-                        <Input
-                          {...field}
-                          type="email"
-                          name="email"
-                          placeholder="Email"
-                          size="lg"
-                        />
-                        {form.errors.email ? (
-                          <FormErrorMessage>
-                            {form.errors.email}
-                          </FormErrorMessage>
-                        ) : null}
-                      </FormControl>
-                    )}
-                  </Field>
-                  <Field name="username">
-                    {({ field, form }) => (
-                      <FormControl
-                        isRequired
-                        isInvalid={!!form.errors.username}
-                        mt={6}
-                      >
-                        <FormLabel> Username </FormLabel>
-                        <Input
-                          {...field}
-                          type="text"
-                          name="username"
-                          placeholder="Username"
-                          size="lg"
-                        />
-                        {form.errors.username ? (
-                          <FormErrorMessage>
-                            {form.errors.username}
-                          </FormErrorMessage>
-                        ) : null}
-                      </FormControl>
-                    )}
-                  </Field>
-                  <Field name="password">
-                    {({ field, form }) => (
-                      <FormControl
-                        isRequired
-                        isInvalid={!!form.errors.password}
-                        mt={6}
-                      >
-                        <FormLabel> Password </FormLabel>
-                        <Input
-                          {...field}
-                          type="password"
-                          name="password"
-                          placeholder="Password"
-                        />
-                        {form.errors.password ? (
-                          <FormErrorMessage>
-                            {form.errors.password}
-                          </FormErrorMessage>
-                        ) : null}
-                      </FormControl>
-                    )}
-                  </Field>
+                  <InputField
+                    name="email"
+                    type="email"
+                    placeholder="Email"
+                    boxSize="lg"
+                    label="Email"
+                  />
+                  <InputField
+                    name="username"
+                    type="username"
+                    placeholder="Username"
+                    boxSize="lg"
+                    label="Username"
+                  />
+                  <InputField
+                    name="password"
+                    type="password"
+                    placeholder="Password"
+                    boxSize="lg"
+                    label="Password"
+                  />
                   <Button
                     colorScheme="teal"
                     width="full"
@@ -138,4 +94,4 @@ const Login = () => {
   );
 };
 
-export default withApollo({ ssr: false })(Login);
+export default withApollo({ ssr: false })(Register);
