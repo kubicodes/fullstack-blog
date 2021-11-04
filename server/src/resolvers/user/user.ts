@@ -1,4 +1,4 @@
-import { Arg, Ctx, Int, Mutation, Resolver } from "type-graphql";
+import { Arg, Ctx, Int, Mutation, Query, Resolver } from "type-graphql";
 import { User } from "../../entities/User";
 import { CustomContext } from "../types/CustomContext";
 import { UserResponse } from "../types/UserResponse";
@@ -122,8 +122,8 @@ export class UserResolver {
       return {
         errors: [
           {
-            field: "Username or Password",
-            message: "Invalid Username or Password",
+            field: "usernameOrEmail",
+            message: "Invalid Login Data",
           },
         ],
       };
@@ -138,8 +138,8 @@ export class UserResolver {
       return {
         errors: [
           {
-            field: "Username or Password",
-            message: "Invalid Username or Password",
+            field: "password",
+            message: "Invalid Login Data",
           },
         ],
       };
@@ -169,5 +169,26 @@ export class UserResolver {
         resolve(true);
       });
     });
+  }
+
+  @Query(() => UserResponse, { nullable: true })
+  async me(@Ctx() { req }: CustomContext): Promise<UserResponse | null> {
+    if (!req.session.userId) {
+      return null;
+    }
+
+    const matchedUser = await User.findOne(req!.session!.userId);
+
+    if (!matchedUser) {
+      return null;
+    }
+
+    return {
+      users: [
+        {
+          ...matchedUser,
+        },
+      ],
+    };
   }
 }

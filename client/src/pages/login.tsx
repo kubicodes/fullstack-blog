@@ -5,34 +5,52 @@ import React, { useEffect } from "react";
 import InputField from "../components/InputField";
 import { Wrapper } from "../components/Wrapper";
 import {
+  MeDocument,
+  MeQuery,
+  useLoginMutation,
   useMeQuery,
-  useRegisterMutation,
-  useRolesQuery,
 } from "../generated/graphql";
 import { errorMap } from "../utils/errorMap";
 import { withApollo } from "../utils/withApollo";
 
 const Register = () => {
-  const [register] = useRegisterMutation();
-  const { data: rolesData } = useRolesQuery();
+  const [login] = useLoginMutation();
   const router = useRouter();
   const { data: meQueryData, loading } = useMeQuery();
 
   const handleSubmit = async (values, { setErrors }) => {
-    const authorRole = rolesData?.roles?.roles?.find(
-      (role) => role.title === "author"
-    );
-    const response = await register({
+    const response = await login({
       variables: {
-        role: authorRole!.id,
-        email: values.email,
-        username: values.username,
-        password: values.password,
+        loginOptions: {
+          usernameOrEmail: values.usernameOrEmail,
+          password: values.password,
+        },
+      },
+      update: (cache, { data }) => {
+        if (data?.login.users[0]) {
+          const userData = data!.login!.users![0];
+          cache.writeQuery<MeQuery>({
+            query: MeDocument,
+            data: {
+              __typename: "Query",
+              me: {
+                users: [
+                  {
+                    ...userData,
+                  },
+                ],
+              },
+            },
+          });
+        }
       },
     });
 
-    if (response.data?.register.errors) {
-      const formikFormattedErrors = errorMap(response.data.register.errors);
+    if (response.data?.login.errors) {
+      const formikFormattedErrors: Record<string, string> = errorMap(
+        response.data.login.errors
+      );
+
       setErrors(formikFormattedErrors);
     } else {
       router.push("/");
@@ -49,7 +67,7 @@ const Register = () => {
   return (
     <Wrapper>
       <Formik
-        initialValues={{ email: "", username: "", password: "" }}
+        initialValues={{ usernameOrEmail: "", password: "" }}
         onSubmit={handleSubmit}
       >
         {({ isSubmitting }) => (
@@ -68,18 +86,11 @@ const Register = () => {
                   </Box>
                   <Box my={4} textAlign="left">
                     <InputField
-                      name="email"
-                      type="email"
-                      placeholder="Email"
+                      name="usernameOrEmail"
+                      type="text"
+                      placeholder="Username Or Email"
                       boxSize="lg"
-                      label="Email"
-                    />
-                    <InputField
-                      name="username"
-                      type="username"
-                      placeholder="Username"
-                      boxSize="lg"
-                      label="Username"
+                      label="Username Or Email"
                     />
                     <InputField
                       name="password"
@@ -89,7 +100,7 @@ const Register = () => {
                       label="Password"
                     />
                     <Button
-                      colorScheme="teal"
+                      colorScheme="twitter"
                       width="full"
                       mt={4}
                       type="submit"

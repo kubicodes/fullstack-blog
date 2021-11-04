@@ -1,10 +1,10 @@
 import { FormikErrors } from "formik";
 import { FieldError } from "../generated/graphql";
 
-export const errorMap = (errors: FieldError[]) => {
-  const mappedErrors: FormikErrors<Record<string, string>> = {};
+export const errorMap = (errors: FieldError[]): Record<string, string> => {
+  const mappedErrors: Record<string, string> = {};
 
-  errors.forEach(({ field, message }) => {
+  errors.forEach(({ field, message }: { field: string; message: string }) => {
     mappedErrors[field] = message;
   });
 

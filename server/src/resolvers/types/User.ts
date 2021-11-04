@@ -16,6 +16,9 @@ export class User {
   @Field()
   role?: string;
 
+  @Field(() => Int)
+  role_id?: number;
+
   @Field()
   createdAt!: Date;
 
