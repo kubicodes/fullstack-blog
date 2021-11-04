@@ -13,6 +13,8 @@ import { Role } from "./entities/Role";
 import { User } from "./entities/User";
 import { RoleResolver } from "./resolvers/role/role";
 import { UserResolver } from "./resolvers/user/user";
+import { Post } from "./entities/Post";
+import { Comment } from "./entities/Comment";
 
 const main = async () => {
   const connection = await createConnection({
@@ -24,7 +26,7 @@ const main = async () => {
     database: process.env.DATABASE_NAME,
     logging: true,
     synchronize: false,
-    entities: [User, Role],
+    entities: [User, Role, Post, Comment],
     migrations: [path.join(__dirname, "./migrations/*")],
   });
 
