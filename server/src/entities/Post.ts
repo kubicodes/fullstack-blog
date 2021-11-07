@@ -5,11 +5,10 @@ import {
   CreateDateColumn,
   Entity,
   OneToMany,
-  OneToOne,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from "typeorm";
-import { User } from "./User";
+import { Comment } from "./Comment";
 
 @ObjectType()
 @Entity()
@@ -27,14 +26,16 @@ export class Post extends BaseEntity {
   body!: string;
 
   @Column()
-  @OneToMany(() => User, (user) => user.id)
   authorId!: number;
+
+  @OneToMany(() => Comment, (comment) => comment.postId)
+  comments?: Comment[];
 
   @Field()
   @CreateDateColumn()
-  createdAt: Date;
+  createdAt!: Date;
 
   @Field()
   @UpdateDateColumn()
-  updatedAt: Date;
+  updatedAt!: Date;
 }

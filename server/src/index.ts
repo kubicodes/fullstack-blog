@@ -15,6 +15,7 @@ import { RoleResolver } from "./resolvers/role/role";
 import { UserResolver } from "./resolvers/user/user";
 import { Post } from "./entities/Post";
 import { Comment } from "./entities/Comment";
+import { PostResolver } from "./resolvers/post/post";
 
 const main = async () => {
   const connection = await createConnection({
@@ -65,7 +66,7 @@ const main = async () => {
 
   const apolloServer = new ApolloServer({
     schema: await buildSchema({
-      resolvers: [RoleResolver, UserResolver],
+      resolvers: [RoleResolver, UserResolver, PostResolver],
       validate: false,
     }),
     context: ({ req, res }) => ({
