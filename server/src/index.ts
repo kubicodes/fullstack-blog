@@ -16,6 +16,7 @@ import { UserResolver } from "./resolvers/user/user";
 import { Post } from "./entities/Post";
 import { Comment } from "./entities/Comment";
 import { PostResolver } from "./resolvers/post/post";
+import { CommentResolver } from "./resolvers/comment/comment";
 
 const main = async () => {
   const connection = await createConnection({
@@ -29,6 +30,9 @@ const main = async () => {
     synchronize: false,
     entities: [User, Role, Post, Comment],
     migrations: [path.join(__dirname, "./migrations/*")],
+    extra: {
+      namedPlaceholders: true,
+    },
   });
 
   await connection.runMigrations();
@@ -66,7 +70,7 @@ const main = async () => {
 
   const apolloServer = new ApolloServer({
     schema: await buildSchema({
-      resolvers: [RoleResolver, UserResolver, PostResolver],
+      resolvers: [RoleResolver, UserResolver, PostResolver, CommentResolver],
       validate: false,
     }),
     context: ({ req, res }) => ({

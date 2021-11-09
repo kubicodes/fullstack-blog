@@ -5,14 +5,18 @@ import {
   Mutation,
   Query,
   Resolver,
-  UseMiddleware,
+  UseMiddleware
 } from "type-graphql";
+import { getConnection } from "typeorm";
+import { Comment } from "../../entities/Comment";
 import { Post } from "../../entities/Post";
+import { User } from "../../entities/User";
 import { isAuth } from "../../middleware/isAuth";
 import { CustomContext } from "../types/CustomContext";
 import { PostResponse } from "../types/PostResponse";
 import { useIsBodyValid } from "./utils/useIsBodyValid";
 import { useIsHeadlineValid } from "./utils/useIsHeadlineValid";
+import { useMapRawResultToEntity } from "./utils/useMapRawResultToEntity";
 
 @Resolver(Post)
 export class PostResolver {
@@ -21,9 +25,22 @@ export class PostResolver {
     @Arg("postId", { nullable: true }) postId?: number
   ): Promise<PostResponse> {
     if (postId) {
-      let matchedPost: any;
+      let currentPostMapping: Record<string, any> = {};
+      let currentUserMapping: Record<string, any> = {};
+      let currentCommentMapping: Record<string, any> = {};
+
       try {
-        matchedPost = await Post.findOne(postId);
+        const rawResult = await getConnection()
+          .getRepository(Post)
+          .createQueryBuilder("p")
+          .leftJoinAndSelect(User, "u", "p.authorId = u.id")
+          .leftJoinAndSelect(Comment, "c", "c.postId = p.id")
+          .where(`p.id = ${postId.toString()}`)
+          .getRawMany();
+
+        if (rawResult && rawResult[0]) {
+          useMapRawResultToEntity(rawResult, currentPostMapping, currentUserMapping, currentCommentMapping);
+        }
       } catch (error) {
         return {
           errors: [
@@ -31,23 +48,53 @@ export class PostResolver {
           ],
         };
       }
+      const postObject = await Post.create(currentPostMapping);
+      const commentObject = await Comment.create(currentCommentMapping);
+      const userObject = await User.create(currentUserMapping);
 
-      return { posts: [matchedPost] };
+      (postObject.author as any) = { ...userObject };
+      (postObject.comments as any) = [{ ...commentObject }];
+
+      return {
+        posts: [postObject],
+      };
     }
 
-    let posts;
+    let currentPostMapping: Record<string, any> = {};
+    let currentUserMapping: Record<string, any> = {};
+    let currentCommentMapping: Record<string, any> = {};
+    let allPosts: Post[] = [];
 
-    try {
-      posts = await Post.find({});
-    } catch (error) {
-      return { errors: [{ message: "Internal Server Error" }] };
+    const rawResult: Record<string, any>[] = await getConnection()
+      .getRepository(Post)
+      .createQueryBuilder("p")
+      .leftJoinAndSelect(User, "u", "p.authorId = u.id")
+      .leftJoinAndSelect(Comment, "c", "c.postId = p.id")
+      .getRawMany();
+
+    if (rawResult) {
+      rawResult.forEach((rawObject: Record<string, any>) => {
+        useMapRawResultToEntity(
+          rawObject,
+          currentPostMapping,
+          currentUserMapping,
+          currentCommentMapping
+        );
+
+        let currentPostObject = Post.create(currentPostMapping);
+        let currentCommentObject = Comment.create(currentCommentMapping);
+        let currentUserObject = User.create(currentUserMapping);
+
+        (currentPostObject.comments as any) = [{ ...currentCommentObject }];
+        (currentPostObject.author as any) = { ...currentUserObject };
+
+        if (!allPosts.includes(currentPostObject)) {
+          allPosts.push(currentPostObject);
+        }
+      });
     }
 
-    if (!posts) {
-      return { errors: [{ message: "No Posts exists" }] };
-    }
-
-    return { posts };
+    return { posts: allPosts };
   }
 
   @Mutation(() => PostResponse)

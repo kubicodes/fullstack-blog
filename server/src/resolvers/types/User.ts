@@ -2,7 +2,7 @@ import { Field, Int, ObjectType } from "type-graphql";
 import { FieldError } from "./FieldError";
 import { SingleRoleResponse } from "./SingleRoleResponse";
 
-@ObjectType()
+@ObjectType("UserType")
 export class User {
   @Field(() => Int)
   id!: number;
