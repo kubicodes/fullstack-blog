@@ -4,10 +4,11 @@ import {
   Column,
   CreateDateColumn,
   Entity,
-  JoinColumn, OneToOne,
+  JoinColumn,
+  OneToOne,
   PrimaryColumn,
   PrimaryGeneratedColumn,
-  UpdateDateColumn
+  UpdateDateColumn,
 } from "typeorm";
 import { Post } from "./Post";
 import { User } from "./User";
@@ -31,9 +32,10 @@ export class Comment extends BaseEntity {
   @PrimaryColumn()
   authorId!: number;
 
+  @Field(() => User, { nullable: true })
   @OneToOne(() => Post, (post) => post.id)
   @JoinColumn({ name: "id" })
-  author!: User;
+  author?: User;
 
   @OneToOne(() => User, (user) => user.id)
   @JoinColumn({ name: "id" })

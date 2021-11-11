@@ -18,6 +18,7 @@ export type Scalars = {
 
 export type Comment = {
   __typename?: 'Comment';
+  author: User;
   authorId: Scalars['Float'];
   body: Scalars['String'];
   createdAt: Scalars['DateTime'];
@@ -192,13 +193,13 @@ export type UserType = {
 
 export type AuthorSnippetFragment = { __typename?: 'User', id: number, email: string, username: string, createdAt: any, updatedAt: any };
 
-export type CommentSnippetFragment = { __typename?: 'Comment', id: number, body: string, postId: number, authorId: number, createdAt: any, updatedAt: any };
+export type CommentSnippetFragment = { __typename?: 'Comment', id: number, body: string, postId: number, authorId: number, createdAt: any, updatedAt: any, author: { __typename?: 'User', username: string } };
 
 export type PostSnippetFragment = { __typename?: 'Post', id: number, body: string, headline: string, createdAt: any, updatedAt: any };
 
 export type RegularErrorResponseFragment = { __typename?: 'FieldError', field?: string | null | undefined, message?: string | null | undefined };
 
-export type RegularPostResponseFragment = { __typename?: 'Post', id: number, body: string, headline: string, createdAt: any, updatedAt: any, author: { __typename?: 'User', id: number, email: string, username: string, createdAt: any, updatedAt: any }, comments?: Array<{ __typename?: 'Comment', id: number, body: string, postId: number, authorId: number, createdAt: any, updatedAt: any }> | null | undefined };
+export type RegularPostResponseFragment = { __typename?: 'Post', id: number, body: string, headline: string, createdAt: any, updatedAt: any, author: { __typename?: 'User', id: number, email: string, username: string, createdAt: any, updatedAt: any }, comments?: Array<{ __typename?: 'Comment', id: number, body: string, postId: number, authorId: number, createdAt: any, updatedAt: any, author: { __typename?: 'User', username: string } }> | null | undefined };
 
 export type LoginMutationVariables = Exact<{
   loginOptions: LoginOptions;
@@ -232,7 +233,7 @@ export type PostsQueryVariables = Exact<{
 }>;
 
 
-export type PostsQuery = { __typename?: 'Query', posts: { __typename?: 'PostResponse', posts?: Array<{ __typename?: 'Post', id: number, body: string, headline: string, createdAt: any, updatedAt: any, author: { __typename?: 'User', id: number, email: string, username: string, createdAt: any, updatedAt: any }, comments?: Array<{ __typename?: 'Comment', id: number, body: string, postId: number, authorId: number, createdAt: any, updatedAt: any }> | null | undefined }> | null | undefined, errors?: Array<{ __typename?: 'FieldError', field?: string | null | undefined, message?: string | null | undefined }> | null | undefined } };
+export type PostsQuery = { __typename?: 'Query', posts: { __typename?: 'PostResponse', posts?: Array<{ __typename?: 'Post', id: number, body: string, headline: string, createdAt: any, updatedAt: any, author: { __typename?: 'User', id: number, email: string, username: string, createdAt: any, updatedAt: any }, comments?: Array<{ __typename?: 'Comment', id: number, body: string, postId: number, authorId: number, createdAt: any, updatedAt: any, author: { __typename?: 'User', username: string } }> | null | undefined }> | null | undefined, errors?: Array<{ __typename?: 'FieldError', field?: string | null | undefined, message?: string | null | undefined }> | null | undefined } };
 
 export type RolesQueryVariables = Exact<{ [key: string]: never; }>;
 
@@ -270,6 +271,9 @@ export const CommentSnippetFragmentDoc = gql`
   body
   postId
   authorId
+  author {
+    username
+  }
   createdAt
   updatedAt
 }

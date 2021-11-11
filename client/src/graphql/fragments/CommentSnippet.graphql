@@ -3,6 +3,9 @@ fragment CommentSnippet on Comment {
   body
   postId
   authorId
+  author {
+    username
+  }
   createdAt
   updatedAt
 }

@@ -25,6 +25,7 @@ export class PostResolver {
     @Arg("postId", () => Int, { nullable: true }) postId?: number
   ): Promise<PostResponse> {
     if (postId) {
+      console.log("angekommen");
       let currentPostMapping: Record<string, any> = {};
       let currentUserMapping: Record<string, any> = {};
       let currentCommentMapping: Record<string, any> = {};
@@ -55,6 +56,11 @@ export class PostResolver {
       }
       const postObject = await Post.create(currentPostMapping);
       const commentObject = await Comment.create(currentCommentMapping);
+
+      commentObject.author = (await User.findOne(
+        commentObject.authorId
+      )) as User;
+
       const userObject = await User.create(currentUserMapping);
 
       (postObject.author as any) = { ...userObject };
@@ -78,7 +84,7 @@ export class PostResolver {
       .getRawMany();
 
     if (rawResult) {
-      rawResult.forEach((rawObject: Record<string, any>) => {
+      rawResult.forEach(async (rawObject: Record<string, any>) => {
         useMapRawResultToEntity(
           rawObject,
           currentPostMapping,

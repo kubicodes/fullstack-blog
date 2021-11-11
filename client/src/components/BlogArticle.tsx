@@ -1,11 +1,12 @@
 import { ChatIcon } from "@chakra-ui/icons";
 import { Box, Flex, Heading, Text } from "@chakra-ui/layout";
-import { Divider, Wrap, WrapItem, Link } from "@chakra-ui/react";
+import { Divider, Link, Wrap, WrapItem } from "@chakra-ui/react";
+import NextLink from "next/link";
 import React from "react";
-import { CommentSnippetFragment } from "../generated/graphql";
 import BlogAuthor from "./BlogAuthor";
 
 type BlogArticle = {
+  id: number;
   headline: string;
   body: string;
   numberOfComments: number;
@@ -14,6 +15,7 @@ type BlogArticle = {
 };
 
 const BlogArticle: React.FC<BlogArticle> = ({
+  id,
   headline,
   body,
   numberOfComments,
@@ -38,9 +40,11 @@ const BlogArticle: React.FC<BlogArticle> = ({
               ></Link>
             </Box>
             <Heading fontSize="xl" marginTop="2">
-              <Link textDecoration="none" _hover={{ textDecoration: "none" }}>
-                {headline}
-              </Link>
+              <NextLink href="/post/[id]" as={`/post/${id}`}>
+                <Link textDecoration="none" _hover={{ textDecoration: "none" }}>
+                  {headline}
+                </Link>
+              </NextLink>
             </Heading>
             <Text as="p" fontSize="md" marginTop="2">
               {body}

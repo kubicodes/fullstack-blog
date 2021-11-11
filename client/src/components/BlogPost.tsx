@@ -12,6 +12,7 @@ const BlogPost: React.FC<BlogPostProps> = ({ blogPost }) => {
   return (
     <Stack spacing={8} mt={6}>
       <BlogArticle
+        id={blogPost.id}
         numberOfComments={numberOfComments}
         headline={blogPost.headline}
         body={blogPost.body}
