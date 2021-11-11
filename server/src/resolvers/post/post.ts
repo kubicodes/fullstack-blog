@@ -15,7 +15,6 @@ import { isAuth } from "../../middleware/isAuth";
 import { CustomContext } from "../types/CustomContext";
 import { PostResponse } from "../types/PostResponse";
 import { UserResponse } from "../types/UserResponse";
-import { getFullPostResultAndMap } from "./utils/getFullPostResultAndMap";
 import { useIsBodyValid } from "./utils/useIsBodyValid";
 import { useIsHeadlineValid } from "./utils/useIsHeadlineValid";
 import { useMapRawResultToEntity } from "./utils/useMapRawResultToEntity";
@@ -32,12 +31,22 @@ export class PostResolver {
       let currentCommentMapping: Record<string, any> = {};
 
       try {
-        getFullPostResultAndMap(
-          currentPostMapping,
-          currentUserMapping,
-          currentCommentMapping,
-          postId
-        );
+        const rawResult = await getConnection()
+          .getRepository(Post)
+          .createQueryBuilder("p")
+          .leftJoinAndSelect(User, "u", "p.authorId = u.id")
+          .leftJoinAndSelect(Comment, "c", "c.postId = p.id")
+          .where(`p.id = ${postId.toString()}`)
+          .getRawMany();
+
+        if (rawResult && rawResult[0]) {
+          useMapRawResultToEntity(
+            rawResult,
+            currentPostMapping,
+            currentUserMapping,
+            currentCommentMapping
+          );
+        }
       } catch (error) {
         return {
           errors: [
