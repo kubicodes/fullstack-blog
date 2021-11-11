@@ -14,6 +14,8 @@ import { User } from "../../entities/User";
 import { isAuth } from "../../middleware/isAuth";
 import { CustomContext } from "../types/CustomContext";
 import { PostResponse } from "../types/PostResponse";
+import { UserResponse } from "../types/UserResponse";
+import { getFullPostResultAndMap } from "./utils/getFullPostResultAndMap";
 import { useIsBodyValid } from "./utils/useIsBodyValid";
 import { useIsHeadlineValid } from "./utils/useIsHeadlineValid";
 import { useMapRawResultToEntity } from "./utils/useMapRawResultToEntity";
@@ -25,28 +27,17 @@ export class PostResolver {
     @Arg("postId", () => Int, { nullable: true }) postId?: number
   ): Promise<PostResponse> {
     if (postId) {
-      console.log("angekommen");
       let currentPostMapping: Record<string, any> = {};
       let currentUserMapping: Record<string, any> = {};
       let currentCommentMapping: Record<string, any> = {};
 
       try {
-        const rawResult = await getConnection()
-          .getRepository(Post)
-          .createQueryBuilder("p")
-          .leftJoinAndSelect(User, "u", "p.authorId = u.id")
-          .leftJoinAndSelect(Comment, "c", "c.postId = p.id")
-          .where(`p.id = ${postId.toString()}`)
-          .getRawMany();
-
-        if (rawResult && rawResult[0]) {
-          useMapRawResultToEntity(
-            rawResult,
-            currentPostMapping,
-            currentUserMapping,
-            currentCommentMapping
-          );
-        }
+        getFullPostResultAndMap(
+          currentPostMapping,
+          currentUserMapping,
+          currentCommentMapping,
+          postId
+        );
       } catch (error) {
         return {
           errors: [
@@ -93,10 +84,12 @@ export class PostResolver {
         );
 
         let currentPostObject = Post.create(currentPostMapping);
-        let currentCommentObject = Comment.create(currentCommentMapping);
-        let currentUserObject = User.create(currentUserMapping);
 
-        (currentPostObject.comments as any) = [{ ...currentCommentObject }];
+        if (currentCommentMapping.id) {
+          let currentCommentObject = Comment.create(currentCommentMapping);
+          (currentPostObject.comments as any) = [{ ...currentCommentObject }];
+        }
+        let currentUserObject = User.create(currentUserMapping);
         (currentPostObject.author as any) = { ...currentUserObject };
 
         if (!allPosts.includes(currentPostObject)) {
@@ -115,11 +108,22 @@ export class PostResolver {
     @Arg("body") body: string,
     @Ctx() { req }: CustomContext
   ): Promise<PostResponse> {
-    useIsHeadlineValid(headline);
-    useIsBodyValid(body);
+    const isHeadlineValid = useIsHeadlineValid(headline);
+    if (!(isHeadlineValid === true)) {
+      return isHeadlineValid as UserResponse;
+    }
+
+    const isBodyValid = useIsBodyValid(body);
+    if (!(isBodyValid === true)) {
+      return isBodyValid as UserResponse;
+    }
+
+    let currentPostMapping: Record<string, any> = {};
+    let currentUserMapping: Record<string, any> = {};
+    let currentCommentMapping: Record<string, any> = {};
 
     try {
-      const createdPost: any = await Post.create({
+      const createdPost: Post = await Post.create({
         headline,
         body,
         authorId: req.session.userId,
@@ -135,8 +139,52 @@ export class PostResolver {
         };
       }
 
+      try {
+        const rawResult = await getConnection()
+          .getRepository(Post)
+          .createQueryBuilder("p")
+          .leftJoinAndSelect(User, "u", "p.authorId = u.id")
+          .leftJoinAndSelect(Comment, "c", "c.postId = p.id")
+          .where(`p.id = ${createdPost.id.toString()}`)
+          .getRawMany();
+
+        if (rawResult && rawResult[0]) {
+          useMapRawResultToEntity(
+            rawResult,
+            currentPostMapping,
+            currentUserMapping,
+            currentCommentMapping
+          );
+        }
+      } catch (error) {
+        return {
+          errors: [
+            {
+              field: "postId",
+              message: `No Post found with ID ${createdPost.id}`,
+            },
+          ],
+        };
+      }
+      const postObject = await Post.create(currentPostMapping);
+
+      if (currentCommentMapping.id) {
+        const commentObject = await Comment.create(currentCommentMapping);
+
+        commentObject.author = (await User.findOne(
+          commentObject.authorId
+        )) as User;
+        (postObject.comments as any) = [{ ...commentObject }];
+      }
+
+      const userObject = await User.create(currentUserMapping);
+
+      (postObject.author as any) = { ...userObject };
+
+      console.log({ posts: [postObject] });
+
       return {
-        posts: [{ ...createdPost }],
+        posts: [postObject],
       };
     } catch (error) {
       return {

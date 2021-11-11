@@ -7,7 +7,7 @@ type BlogPostProps = {
   blogPost: RegularPostResponseFragment;
 };
 const BlogPost: React.FC<BlogPostProps> = ({ blogPost }) => {
-  const numberOfComments = blogPost.comments.length;
+  const numberOfComments = blogPost.comments?.length ?? 0;
 
   return (
     <Stack spacing={8} mt={6}>

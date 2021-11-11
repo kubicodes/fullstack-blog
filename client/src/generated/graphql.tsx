@@ -18,7 +18,7 @@ export type Scalars = {
 
 export type Comment = {
   __typename?: 'Comment';
-  author: User;
+  author?: Maybe<User>;
   authorId: Scalars['Float'];
   body: Scalars['String'];
   createdAt: Scalars['DateTime'];
@@ -193,13 +193,21 @@ export type UserType = {
 
 export type AuthorSnippetFragment = { __typename?: 'User', id: number, email: string, username: string, createdAt: any, updatedAt: any };
 
-export type CommentSnippetFragment = { __typename?: 'Comment', id: number, body: string, postId: number, authorId: number, createdAt: any, updatedAt: any, author: { __typename?: 'User', username: string } };
+export type CommentSnippetFragment = { __typename?: 'Comment', id: number, body: string, postId: number, authorId: number, createdAt: any, updatedAt: any, author?: { __typename?: 'User', username: string } | null | undefined };
 
 export type PostSnippetFragment = { __typename?: 'Post', id: number, body: string, headline: string, createdAt: any, updatedAt: any };
 
 export type RegularErrorResponseFragment = { __typename?: 'FieldError', field?: string | null | undefined, message?: string | null | undefined };
 
-export type RegularPostResponseFragment = { __typename?: 'Post', id: number, body: string, headline: string, createdAt: any, updatedAt: any, author: { __typename?: 'User', id: number, email: string, username: string, createdAt: any, updatedAt: any }, comments?: Array<{ __typename?: 'Comment', id: number, body: string, postId: number, authorId: number, createdAt: any, updatedAt: any, author: { __typename?: 'User', username: string } }> | null | undefined };
+export type RegularPostResponseFragment = { __typename?: 'Post', id: number, body: string, headline: string, createdAt: any, updatedAt: any, author: { __typename?: 'User', id: number, email: string, username: string, createdAt: any, updatedAt: any }, comments?: Array<{ __typename?: 'Comment', id: number, body: string, postId: number, authorId: number, createdAt: any, updatedAt: any, author?: { __typename?: 'User', username: string } | null | undefined }> | null | undefined };
+
+export type CreatePostMutationVariables = Exact<{
+  body: Scalars['String'];
+  headline: Scalars['String'];
+}>;
+
+
+export type CreatePostMutation = { __typename?: 'Mutation', createPost: { __typename?: 'PostResponse', posts?: Array<{ __typename?: 'Post', id: number, body: string, headline: string, createdAt: any, updatedAt: any, author: { __typename?: 'User', id: number, email: string, username: string, createdAt: any, updatedAt: any }, comments?: Array<{ __typename?: 'Comment', id: number, body: string, postId: number, authorId: number, createdAt: any, updatedAt: any, author?: { __typename?: 'User', username: string } | null | undefined }> | null | undefined }> | null | undefined, errors?: Array<{ __typename?: 'FieldError', field?: string | null | undefined, message?: string | null | undefined }> | null | undefined } };
 
 export type LoginMutationVariables = Exact<{
   loginOptions: LoginOptions;
@@ -233,7 +241,7 @@ export type PostsQueryVariables = Exact<{
 }>;
 
 
-export type PostsQuery = { __typename?: 'Query', posts: { __typename?: 'PostResponse', posts?: Array<{ __typename?: 'Post', id: number, body: string, headline: string, createdAt: any, updatedAt: any, author: { __typename?: 'User', id: number, email: string, username: string, createdAt: any, updatedAt: any }, comments?: Array<{ __typename?: 'Comment', id: number, body: string, postId: number, authorId: number, createdAt: any, updatedAt: any, author: { __typename?: 'User', username: string } }> | null | undefined }> | null | undefined, errors?: Array<{ __typename?: 'FieldError', field?: string | null | undefined, message?: string | null | undefined }> | null | undefined } };
+export type PostsQuery = { __typename?: 'Query', posts: { __typename?: 'PostResponse', posts?: Array<{ __typename?: 'Post', id: number, body: string, headline: string, createdAt: any, updatedAt: any, author: { __typename?: 'User', id: number, email: string, username: string, createdAt: any, updatedAt: any }, comments?: Array<{ __typename?: 'Comment', id: number, body: string, postId: number, authorId: number, createdAt: any, updatedAt: any, author?: { __typename?: 'User', username: string } | null | undefined }> | null | undefined }> | null | undefined, errors?: Array<{ __typename?: 'FieldError', field?: string | null | undefined, message?: string | null | undefined }> | null | undefined } };
 
 export type RolesQueryVariables = Exact<{ [key: string]: never; }>;
 
@@ -291,6 +299,46 @@ export const RegularPostResponseFragmentDoc = gql`
     ${PostSnippetFragmentDoc}
 ${AuthorSnippetFragmentDoc}
 ${CommentSnippetFragmentDoc}`;
+export const CreatePostDocument = gql`
+    mutation CreatePost($body: String!, $headline: String!) {
+  createPost(body: $body, headline: $headline) {
+    posts {
+      ...RegularPostResponse
+    }
+    errors {
+      ...RegularErrorResponse
+    }
+  }
+}
+    ${RegularPostResponseFragmentDoc}
+${RegularErrorResponseFragmentDoc}`;
+export type CreatePostMutationFn = Apollo.MutationFunction<CreatePostMutation, CreatePostMutationVariables>;
+
+/**
+ * __useCreatePostMutation__
+ *
+ * To run a mutation, you first call `useCreatePostMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useCreatePostMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [createPostMutation, { data, loading, error }] = useCreatePostMutation({
+ *   variables: {
+ *      body: // value for 'body'
+ *      headline: // value for 'headline'
+ *   },
+ * });
+ */
+export function useCreatePostMutation(baseOptions?: Apollo.MutationHookOptions<CreatePostMutation, CreatePostMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<CreatePostMutation, CreatePostMutationVariables>(CreatePostDocument, options);
+      }
+export type CreatePostMutationHookResult = ReturnType<typeof useCreatePostMutation>;
+export type CreatePostMutationResult = Apollo.MutationResult<CreatePostMutation>;
+export type CreatePostMutationOptions = Apollo.BaseMutationOptions<CreatePostMutation, CreatePostMutationVariables>;
 export const LoginDocument = gql`
     mutation Login($loginOptions: LoginOptions!) {
   login(LoginOptions: $loginOptions) {

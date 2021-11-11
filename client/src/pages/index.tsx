@@ -9,7 +9,6 @@ import NextLink from "next/link";
 const Index = () => {
   const { data: blogPosts, loading, error } = usePostsQuery();
   const { data: meData } = useMeQuery();
-  console.log(meData);
   if (!loading && !blogPosts) {
     return (
       <>

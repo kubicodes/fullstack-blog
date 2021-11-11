@@ -1,0 +1,10 @@
+mutation CreatePost($body: String!, $headline: String!) {
+  createPost(body: $body, headline: $headline) {
+    posts {
+      ...RegularPostResponse
+    }
+    errors {
+      ...RegularErrorResponse
+    }
+  }
+}

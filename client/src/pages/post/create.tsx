@@ -4,25 +4,52 @@ import router from "next/dist/client/router";
 import React, { useEffect } from "react";
 import InputField from "../../components/InputField";
 import { Layout } from "../../components/Layout";
-import { useMeQuery } from "../../generated/graphql";
+import { useCreatePostMutation, useMeQuery } from "../../generated/graphql";
+import { errorMap } from "../../utils/errorMap";
 import { withApollo } from "../../utils/withApollo";
 
+type SubmitValues = {
+  headline: string;
+  body: string;
+};
+
 const CreatePost = () => {
-  const { data: meQueryData } = useMeQuery();
+  const { data: meQueryData, loading: meQueryLoading } = useMeQuery();
+  const [createPost] = useCreatePostMutation();
 
   useEffect(() => {
-    if (!meQueryData?.me) {
+    if (!meQueryLoading && !meQueryData?.me) {
       router.back();
       return;
     }
   }, [meQueryData]);
 
+  const handleSubmit = async (values: SubmitValues, { setErrors }) => {
+    const { data } = await createPost({
+      variables: {
+        headline: values.headline,
+        body: values.body,
+      },
+      update: (cache) => {
+        cache.evict({ fieldName: "posts({})" });
+      },
+    });
+
+    if (data.createPost?.errors) {
+      const formikFormattedErrors: Record<string, string> = errorMap(
+        data.createPost.errors
+      );
+      setErrors(formikFormattedErrors);
+    } else {
+      router.push("/");
+    }
+  };
   return (
     <Layout>
       <Heading fontSize="xl">Create Post</Heading>
       <Formik
         initialValues={{ headline: "", body: "" }}
-        onSubmit={(values) => console.log(values)}
+        onSubmit={handleSubmit}
       >
         {({ isSubmitting }) => (
           <Form>
