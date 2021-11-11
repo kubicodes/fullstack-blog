@@ -1,0 +1,9 @@
+fragment RegularPostResponse on Post {
+  ...PostSnippet
+  author {
+    ...AuthorSnippet
+  }
+  comments {
+    ...CommentSnippet
+  }
+}

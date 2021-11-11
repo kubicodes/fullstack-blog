@@ -5,7 +5,7 @@ import {
   Mutation,
   Query,
   Resolver,
-  UseMiddleware
+  UseMiddleware,
 } from "type-graphql";
 import { getConnection } from "typeorm";
 import { Comment } from "../../entities/Comment";
@@ -22,7 +22,7 @@ import { useMapRawResultToEntity } from "./utils/useMapRawResultToEntity";
 export class PostResolver {
   @Query(() => PostResponse)
   async posts(
-    @Arg("postId", { nullable: true }) postId?: number
+    @Arg("postId", () => Int, { nullable: true }) postId?: number
   ): Promise<PostResponse> {
     if (postId) {
       let currentPostMapping: Record<string, any> = {};
@@ -39,7 +39,12 @@ export class PostResolver {
           .getRawMany();
 
         if (rawResult && rawResult[0]) {
-          useMapRawResultToEntity(rawResult, currentPostMapping, currentUserMapping, currentCommentMapping);
+          useMapRawResultToEntity(
+            rawResult,
+            currentPostMapping,
+            currentUserMapping,
+            currentCommentMapping
+          );
         }
       } catch (error) {
         return {

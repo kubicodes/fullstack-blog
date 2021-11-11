@@ -1,0 +1,7 @@
+fragment AuthorSnippet on User {
+  id
+  email
+  username
+  createdAt
+  updatedAt
+}

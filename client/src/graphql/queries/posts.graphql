@@ -1,0 +1,10 @@
+query Posts($postId: Int) {
+  posts(postId: $postId) {
+    posts {
+      ...RegularPostResponse 
+    }
+    errors {
+      ...RegularErrorResponse
+    }
+  }
+}

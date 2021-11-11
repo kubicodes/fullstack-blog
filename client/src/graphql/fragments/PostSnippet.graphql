@@ -1,0 +1,8 @@
+fragment PostSnippet on Post {
+  id
+  body
+  headline
+  body
+  createdAt
+  updatedAt
+}

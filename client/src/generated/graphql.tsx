@@ -16,6 +16,22 @@ export type Scalars = {
   DateTime: any;
 };
 
+export type Comment = {
+  __typename?: 'Comment';
+  authorId: Scalars['Float'];
+  body: Scalars['String'];
+  createdAt: Scalars['DateTime'];
+  id: Scalars['Float'];
+  postId: Scalars['Float'];
+  updatedAt: Scalars['DateTime'];
+};
+
+export type CommentResponse = {
+  __typename?: 'CommentResponse';
+  comments?: Maybe<Array<Comment>>;
+  errors?: Maybe<Array<FieldError>>;
+};
+
 export type FieldError = {
   __typename?: 'FieldError';
   field?: Maybe<Scalars['String']>;
@@ -29,17 +45,38 @@ export type LoginOptions = {
 
 export type Mutation = {
   __typename?: 'Mutation';
+  createComment: CommentResponse;
+  createPost: PostResponse;
   createRole: SingleRoleResponse;
+  deletePost: Scalars['Boolean'];
   deleteRole: SingleRoleResponse;
   login: UserResponse;
   logout: Scalars['Boolean'];
   register: UserResponse;
+  updatePost: PostResponse;
   updateRole: SingleRoleResponse;
+};
+
+
+export type MutationCreateCommentArgs = {
+  body: Scalars['String'];
+  postId: Scalars['Float'];
+};
+
+
+export type MutationCreatePostArgs = {
+  body: Scalars['String'];
+  headline: Scalars['String'];
 };
 
 
 export type MutationCreateRoleArgs = {
   title: Scalars['String'];
+};
+
+
+export type MutationDeletePostArgs = {
+  postId: Scalars['Float'];
 };
 
 
@@ -61,16 +98,46 @@ export type MutationRegisterArgs = {
 };
 
 
+export type MutationUpdatePostArgs = {
+  body?: Maybe<Scalars['String']>;
+  headline?: Maybe<Scalars['String']>;
+  postId: Scalars['Int'];
+};
+
+
 export type MutationUpdateRoleArgs = {
   id: Scalars['Float'];
   title: Scalars['String'];
 };
 
+export type Post = {
+  __typename?: 'Post';
+  author: User;
+  body: Scalars['String'];
+  comments?: Maybe<Array<Comment>>;
+  createdAt: Scalars['DateTime'];
+  headline: Scalars['String'];
+  id: Scalars['Float'];
+  updatedAt: Scalars['DateTime'];
+};
+
+export type PostResponse = {
+  __typename?: 'PostResponse';
+  errors?: Maybe<Array<FieldError>>;
+  posts?: Maybe<Array<Post>>;
+};
+
 export type Query = {
   __typename?: 'Query';
   me?: Maybe<UserResponse>;
+  posts: PostResponse;
   role: SingleRoleResponse;
   roles: RoleResponse;
+};
+
+
+export type QueryPostsArgs = {
+  postId?: Maybe<Scalars['Int']>;
 };
 
 
@@ -100,9 +167,8 @@ export type User = {
   __typename?: 'User';
   createdAt: Scalars['DateTime'];
   email: Scalars['String'];
-  id: Scalars['Int'];
-  role: Scalars['String'];
-  role_id: Scalars['Int'];
+  id: Scalars['Float'];
+  posts?: Maybe<Array<Post>>;
   updatedAt: Scalars['DateTime'];
   username: Scalars['String'];
 };
@@ -110,15 +176,36 @@ export type User = {
 export type UserResponse = {
   __typename?: 'UserResponse';
   errors?: Maybe<Array<FieldError>>;
-  users?: Maybe<Array<User>>;
+  users?: Maybe<Array<UserType>>;
 };
+
+export type UserType = {
+  __typename?: 'UserType';
+  createdAt: Scalars['DateTime'];
+  email: Scalars['String'];
+  id: Scalars['Int'];
+  role: Scalars['String'];
+  role_id: Scalars['Int'];
+  updatedAt: Scalars['DateTime'];
+  username: Scalars['String'];
+};
+
+export type AuthorSnippetFragment = { __typename?: 'User', id: number, email: string, username: string, createdAt: any, updatedAt: any };
+
+export type CommentSnippetFragment = { __typename?: 'Comment', id: number, body: string, postId: number, authorId: number, createdAt: any, updatedAt: any };
+
+export type PostSnippetFragment = { __typename?: 'Post', id: number, body: string, headline: string, createdAt: any, updatedAt: any };
+
+export type RegularErrorResponseFragment = { __typename?: 'FieldError', field?: string | null | undefined, message?: string | null | undefined };
+
+export type RegularPostResponseFragment = { __typename?: 'Post', id: number, body: string, headline: string, createdAt: any, updatedAt: any, author: { __typename?: 'User', id: number, email: string, username: string, createdAt: any, updatedAt: any }, comments?: Array<{ __typename?: 'Comment', id: number, body: string, postId: number, authorId: number, createdAt: any, updatedAt: any }> | null | undefined };
 
 export type LoginMutationVariables = Exact<{
   loginOptions: LoginOptions;
 }>;
 
 
-export type LoginMutation = { __typename?: 'Mutation', login: { __typename?: 'UserResponse', users?: Array<{ __typename?: 'User', id: number, email: string, username: string, role_id: number, createdAt: any, updatedAt: any }> | null | undefined, errors?: Array<{ __typename?: 'FieldError', field?: string | null | undefined, message?: string | null | undefined }> | null | undefined } };
+export type LoginMutation = { __typename?: 'Mutation', login: { __typename?: 'UserResponse', users?: Array<{ __typename?: 'UserType', id: number, email: string, username: string, role_id: number, createdAt: any, updatedAt: any }> | null | undefined, errors?: Array<{ __typename?: 'FieldError', field?: string | null | undefined, message?: string | null | undefined }> | null | undefined } };
 
 export type LogoutMutationVariables = Exact<{ [key: string]: never; }>;
 
@@ -133,19 +220,73 @@ export type RegisterMutationVariables = Exact<{
 }>;
 
 
-export type RegisterMutation = { __typename?: 'Mutation', register: { __typename?: 'UserResponse', users?: Array<{ __typename?: 'User', id: number, email: string, username: string, createdAt: any, updatedAt: any }> | null | undefined, errors?: Array<{ __typename?: 'FieldError', field?: string | null | undefined, message?: string | null | undefined }> | null | undefined } };
+export type RegisterMutation = { __typename?: 'Mutation', register: { __typename?: 'UserResponse', users?: Array<{ __typename?: 'UserType', id: number, email: string, username: string, createdAt: any, updatedAt: any }> | null | undefined, errors?: Array<{ __typename?: 'FieldError', field?: string | null | undefined, message?: string | null | undefined }> | null | undefined } };
 
 export type MeQueryVariables = Exact<{ [key: string]: never; }>;
 
 
-export type MeQuery = { __typename?: 'Query', me?: { __typename?: 'UserResponse', users?: Array<{ __typename?: 'User', id: number, username: string, email: string, role_id: number, createdAt: any, updatedAt: any }> | null | undefined } | null | undefined };
+export type MeQuery = { __typename?: 'Query', me?: { __typename?: 'UserResponse', users?: Array<{ __typename?: 'UserType', id: number, username: string, email: string, role_id: number, createdAt: any, updatedAt: any }> | null | undefined } | null | undefined };
+
+export type PostsQueryVariables = Exact<{
+  postId?: Maybe<Scalars['Int']>;
+}>;
+
+
+export type PostsQuery = { __typename?: 'Query', posts: { __typename?: 'PostResponse', posts?: Array<{ __typename?: 'Post', id: number, body: string, headline: string, createdAt: any, updatedAt: any, author: { __typename?: 'User', id: number, email: string, username: string, createdAt: any, updatedAt: any }, comments?: Array<{ __typename?: 'Comment', id: number, body: string, postId: number, authorId: number, createdAt: any, updatedAt: any }> | null | undefined }> | null | undefined, errors?: Array<{ __typename?: 'FieldError', field?: string | null | undefined, message?: string | null | undefined }> | null | undefined } };
 
 export type RolesQueryVariables = Exact<{ [key: string]: never; }>;
 
 
 export type RolesQuery = { __typename?: 'Query', roles: { __typename?: 'RoleResponse', roles?: Array<{ __typename?: 'Role', id: number, title: string }> | null | undefined, errors?: Array<{ __typename?: 'FieldError', field?: string | null | undefined, message?: string | null | undefined }> | null | undefined } };
 
-
+export const RegularErrorResponseFragmentDoc = gql`
+    fragment RegularErrorResponse on FieldError {
+  field
+  message
+}
+    `;
+export const PostSnippetFragmentDoc = gql`
+    fragment PostSnippet on Post {
+  id
+  body
+  headline
+  body
+  createdAt
+  updatedAt
+}
+    `;
+export const AuthorSnippetFragmentDoc = gql`
+    fragment AuthorSnippet on User {
+  id
+  email
+  username
+  createdAt
+  updatedAt
+}
+    `;
+export const CommentSnippetFragmentDoc = gql`
+    fragment CommentSnippet on Comment {
+  id
+  body
+  postId
+  authorId
+  createdAt
+  updatedAt
+}
+    `;
+export const RegularPostResponseFragmentDoc = gql`
+    fragment RegularPostResponse on Post {
+  ...PostSnippet
+  author {
+    ...AuthorSnippet
+  }
+  comments {
+    ...CommentSnippet
+  }
+}
+    ${PostSnippetFragmentDoc}
+${AuthorSnippetFragmentDoc}
+${CommentSnippetFragmentDoc}`;
 export const LoginDocument = gql`
     mutation Login($loginOptions: LoginOptions!) {
   login(LoginOptions: $loginOptions) {
@@ -307,6 +448,47 @@ export function useMeLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<MeQuery
 export type MeQueryHookResult = ReturnType<typeof useMeQuery>;
 export type MeLazyQueryHookResult = ReturnType<typeof useMeLazyQuery>;
 export type MeQueryResult = Apollo.QueryResult<MeQuery, MeQueryVariables>;
+export const PostsDocument = gql`
+    query Posts($postId: Int) {
+  posts(postId: $postId) {
+    posts {
+      ...RegularPostResponse
+    }
+    errors {
+      ...RegularErrorResponse
+    }
+  }
+}
+    ${RegularPostResponseFragmentDoc}
+${RegularErrorResponseFragmentDoc}`;
+
+/**
+ * __usePostsQuery__
+ *
+ * To run a query within a React component, call `usePostsQuery` and pass it any options that fit your needs.
+ * When your component renders, `usePostsQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = usePostsQuery({
+ *   variables: {
+ *      postId: // value for 'postId'
+ *   },
+ * });
+ */
+export function usePostsQuery(baseOptions?: Apollo.QueryHookOptions<PostsQuery, PostsQueryVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<PostsQuery, PostsQueryVariables>(PostsDocument, options);
+      }
+export function usePostsLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<PostsQuery, PostsQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<PostsQuery, PostsQueryVariables>(PostsDocument, options);
+        }
+export type PostsQueryHookResult = ReturnType<typeof usePostsQuery>;
+export type PostsLazyQueryHookResult = ReturnType<typeof usePostsLazyQuery>;
+export type PostsQueryResult = Apollo.QueryResult<PostsQuery, PostsQueryVariables>;
 export const RolesDocument = gql`
     query Roles {
   roles {
