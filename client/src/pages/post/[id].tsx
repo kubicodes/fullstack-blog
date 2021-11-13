@@ -1,4 +1,4 @@
-import { Divider, Heading } from "@chakra-ui/layout";
+import { Divider, Heading, Text } from "@chakra-ui/layout";
 import { useRouter } from "next/dist/client/router";
 import React from "react";
 import BlogPost from "../../components/BlogPost";
@@ -31,9 +31,13 @@ const Post = () => {
       <Heading fontSize="large" mt={12}>
         Comments
       </Heading>
-      {data.posts.posts.map((post) => {
-        return <CommentSection comments={post.comments} />;
-      })}
+      {data.posts.posts.map((post) =>
+        !post.comments ? (
+          <Text mt={5}>There are no comments yet</Text>
+        ) : (
+          <CommentSection comments={post.comments} />
+        )
+      )}
     </Layout>
   );
 };
