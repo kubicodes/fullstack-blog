@@ -55,16 +55,18 @@ export class PostResolver {
         };
       }
       const postObject = await Post.create(currentPostMapping);
-      const commentObject = await Comment.create(currentCommentMapping);
 
-      commentObject.author = (await User.findOne(
-        commentObject.authorId
-      )) as User;
+      if (currentCommentMapping.id) {
+        const commentObject = await Comment.create(currentCommentMapping);
+        commentObject.author = (await User.findOne(
+          commentObject.authorId
+        )) as User;
+        (postObject.comments as any) = [{ ...commentObject }];
+      }
 
       const userObject = await User.create(currentUserMapping);
 
       (postObject.author as any) = { ...userObject };
-      (postObject.comments as any) = [{ ...commentObject }];
 
       return {
         posts: [postObject],
