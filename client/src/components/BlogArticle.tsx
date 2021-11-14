@@ -3,7 +3,7 @@ import { Box, Flex, Heading, Text } from "@chakra-ui/layout";
 import { Divider, Link, Wrap, WrapItem } from "@chakra-ui/react";
 import NextLink from "next/link";
 import React from "react";
-import { useMeQuery } from "../generated/graphql";
+import { useDeletePostMutation, useMeQuery } from "../generated/graphql";
 import BlogAuthor from "./BlogAuthor";
 
 type BlogArticle = {
@@ -31,6 +31,31 @@ const BlogArticle: React.FC<BlogArticle> = ({
       : `${numberOfComments} comments`;
 
   const { data: meData, loading: meDataLoading } = useMeQuery();
+
+  const [deletePost] = useDeletePostMutation();
+
+  const handleDelete = async () => {
+    const confirmValue = confirm(
+      "Are you sure that you want to delete this post?"
+    );
+
+    if (confirmValue) {
+      const deletePostResult = await deletePost({
+        variables: {
+          postId: id,
+        },
+        update: (cache) => {
+          cache.evict({ fieldName: "posts({})" });
+        },
+      });
+
+      if (deletePostResult.errors) {
+        alert(deletePostResult.errors[0].message);
+      }
+    } else {
+      console.log("not confirmed");
+    }
+  };
 
   return (
     <>
@@ -88,23 +113,22 @@ const BlogArticle: React.FC<BlogArticle> = ({
                   </Link>
                 </NextLink>
                 <DeleteIcon mt={4} mb={4} ml={8} verticalAlign={"center"} />
-                <NextLink href="/post/delete/[id]" as={`/post/delete/${id}`}>
-                  <Link
-                    mt={3}
-                    textDecoration="none"
-                    _hover={{ textDecoration: "none" }}
+                <Link
+                  mt={3}
+                  textDecoration="none"
+                  _hover={{ textDecoration: "none" }}
+                  onClick={handleDelete}
+                >
+                  <Text
+                    alignItems={"center"}
+                    display={"flex"}
+                    flex={1}
+                    pl={3}
+                    fontWeight={"medium"}
                   >
-                    <Text
-                      alignItems={"center"}
-                      display={"flex"}
-                      flex={1}
-                      pl={3}
-                      fontWeight={"medium"}
-                    >
-                      Delete
-                    </Text>
-                  </Link>
-                </NextLink>
+                    Delete
+                  </Text>
+                </Link>
               </Flex>
             )}
           </Box>

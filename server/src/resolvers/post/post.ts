@@ -13,6 +13,7 @@ import { Post } from "../../entities/Post";
 import { User } from "../../entities/User";
 import { isAuth } from "../../middleware/isAuth";
 import { CustomContext } from "../types/CustomContext";
+import { DeletePostResponse } from "../types/DeletePostResponse";
 import { PostResponse } from "../types/PostResponse";
 import { UserResponse } from "../types/UserResponse";
 import { useIsBodyValid } from "./utils/useIsBodyValid";
@@ -267,12 +268,12 @@ export class PostResolver {
     return { posts: [{ ...updatedPost }] };
   }
 
-  @Mutation(() => Boolean)
+  @Mutation(() => DeletePostResponse)
   @UseMiddleware(isAuth)
   async deletePost(
-    @Arg("postId") postId: number,
+    @Arg("postId", () => Int) postId: number,
     @Ctx() { req }: CustomContext
-  ): Promise<PostResponse | boolean> {
+  ): Promise<DeletePostResponse> {
     const matchedPost = await Post.findOne(postId);
 
     if (!matchedPost) {
@@ -295,6 +296,6 @@ export class PostResolver {
       return { errors: [{ message: "Error while deleting Post" }] };
     }
 
-    return true;
+    return { deleted: true };
   }
 }
