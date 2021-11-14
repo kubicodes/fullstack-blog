@@ -11,7 +11,7 @@ const CommentSection: React.FC<CommentSectionProps> = ({ comments }) => {
   return (
     <>
       {comments.map((comment) => (
-        <Stack spacing={8} mt={2}>
+        <Stack spacing={8} mt={2} key={comment.id}>
           <Wrap
             spacing="30px"
             marginTop="5"

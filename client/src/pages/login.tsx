@@ -27,8 +27,12 @@ const Register = () => {
         },
       },
       update: (cache, { data }) => {
-        if (data?.login.users[0]) {
-          const userData = data!.login!.users![0];
+        if (data?.login?.errors) {
+          return;
+        }
+
+        if (data?.login?.users[0]) {
+          const userData = data.login.users[0];
           cache.writeQuery<MeQuery>({
             query: MeDocument,
             data: {
@@ -46,6 +50,7 @@ const Register = () => {
       },
     });
 
+    console.log(response);
     if (response.data?.login.errors) {
       const formikFormattedErrors: Record<string, string> = errorMap(
         response.data.login.errors
