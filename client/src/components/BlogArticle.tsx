@@ -1,8 +1,9 @@
-import { ChatIcon } from "@chakra-ui/icons";
+import { ChatIcon, DeleteIcon, EditIcon } from "@chakra-ui/icons";
 import { Box, Flex, Heading, Text } from "@chakra-ui/layout";
 import { Divider, Link, Wrap, WrapItem } from "@chakra-ui/react";
 import NextLink from "next/link";
 import React from "react";
+import { useMeQuery } from "../generated/graphql";
 import BlogAuthor from "./BlogAuthor";
 
 type BlogArticle = {
@@ -12,6 +13,7 @@ type BlogArticle = {
   numberOfComments: number;
   author: string;
   createdAt: string;
+  authorId: number;
 };
 
 const BlogArticle: React.FC<BlogArticle> = ({
@@ -21,11 +23,14 @@ const BlogArticle: React.FC<BlogArticle> = ({
   numberOfComments,
   author,
   createdAt,
+  authorId,
 }) => {
   const commentString =
     numberOfComments === 1
       ? `${numberOfComments} Comment`
       : `${numberOfComments} comments`;
+
+  const { data: meData, loading: meDataLoading } = useMeQuery();
 
   return (
     <>
@@ -62,6 +67,46 @@ const BlogArticle: React.FC<BlogArticle> = ({
               </Text>
             </Flex>
             <BlogAuthor name={author} date={new Date(`${createdAt}`)} />
+            {meDataLoading || meData.me?.users[0].id !== authorId ? null : (
+              <Flex>
+                <EditIcon mt={4} mb={4} verticalAlign={"center"} />
+                <NextLink href="/post/edit/[id]" as={`/post/edit/${id}`}>
+                  <Link
+                    mt={3}
+                    textDecoration="none"
+                    _hover={{ textDecoration: "none" }}
+                  >
+                    <Text
+                      alignItems={"center"}
+                      display={"flex"}
+                      flex={1}
+                      pl={3}
+                      fontWeight={"medium"}
+                    >
+                      Edit
+                    </Text>
+                  </Link>
+                </NextLink>
+                <DeleteIcon mt={4} mb={4} ml={8} verticalAlign={"center"} />
+                <NextLink href="/post/delete/[id]" as={`/post/delete/${id}`}>
+                  <Link
+                    mt={3}
+                    textDecoration="none"
+                    _hover={{ textDecoration: "none" }}
+                  >
+                    <Text
+                      alignItems={"center"}
+                      display={"flex"}
+                      flex={1}
+                      pl={3}
+                      fontWeight={"medium"}
+                    >
+                      Delete
+                    </Text>
+                  </Link>
+                </NextLink>
+              </Flex>
+            )}
           </Box>
         </WrapItem>
       </Wrap>

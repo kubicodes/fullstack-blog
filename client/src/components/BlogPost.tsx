@@ -17,6 +17,7 @@ const BlogPost: React.FC<BlogPostProps> = ({ blogPost }) => {
         headline={blogPost.headline}
         body={blogPost.body}
         author={blogPost.author.username}
+        authorId={blogPost.author.id}
         createdAt={blogPost.createdAt}
       />
     </Stack>
