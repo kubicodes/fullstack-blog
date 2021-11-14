@@ -18,7 +18,6 @@ import { PostResponse } from "../types/PostResponse";
 import { UserResponse } from "../types/UserResponse";
 import { useIsBodyValid } from "./utils/useIsBodyValid";
 import { useIsHeadlineValid } from "./utils/useIsHeadlineValid";
-import { useMapRawResultToEntity } from "./utils/useMapRawResultToEntity";
 
 @Resolver(Post)
 export class PostResolver {
@@ -27,27 +26,42 @@ export class PostResolver {
     @Arg("postId", () => Int, { nullable: true }) postId?: number
   ): Promise<PostResponse> {
     if (postId) {
-      let currentPostMapping: Record<string, any> = {};
-      let currentUserMapping: Record<string, any> = {};
-      let currentCommentMapping: Record<string, any> = {};
-
       try {
-        const rawResult = await getConnection()
+        const result = await getConnection()
           .getRepository(Post)
-          .createQueryBuilder("p")
-          .leftJoinAndSelect(User, "u", "p.authorId = u.id")
-          .leftJoinAndSelect(Comment, "c", "c.postId = p.id")
-          .where(`p.id = ${postId.toString()}`)
-          .getRawMany();
+          .createQueryBuilder("post")
+          .where("post.id=:postId", { postId })
+          .leftJoinAndMapMany(
+            "post.author",
+            User,
+            "user",
+            "post.authorId=user.id"
+          )
+          .leftJoinAndMapMany(
+            "post.comments",
+            Comment,
+            "comment",
+            "comment.postId=post.id"
+          )
+          .leftJoinAndMapMany(
+            "comment.author",
+            User,
+            "user2",
+            "comment.authorId=user2.id"
+          )
+          .getOne();
 
-        if (rawResult && rawResult[0]) {
-          useMapRawResultToEntity(
-            rawResult,
-            currentPostMapping,
-            currentUserMapping,
-            currentCommentMapping
-          );
+        //comming as single indexed array containing user object, only object is required
+        if (result?.author) {
+          result.author = (result.author as any)[0];
         }
+
+        if (
+          result?.comments?.map((comment: Comment) => {
+            comment.author = (comment.author as any)[0];
+          })
+        )
+          return { posts: [result as Post] };
       } catch (error) {
         return {
           errors: [
@@ -55,59 +69,45 @@ export class PostResolver {
           ],
         };
       }
-      const postObject = await Post.create(currentPostMapping);
-
-      if (currentCommentMapping.id) {
-        const commentObject = await Comment.create(currentCommentMapping);
-        commentObject.author = (await User.findOne(
-          commentObject.authorId
-        )) as User;
-        (postObject.comments as any) = [{ ...commentObject }];
-      }
-
-      const userObject = await User.create(currentUserMapping);
-
-      (postObject.author as any) = { ...userObject };
-
-      return {
-        posts: [postObject],
-      };
     }
 
-    let currentPostMapping: Record<string, any> = {};
-    let currentUserMapping: Record<string, any> = {};
-    let currentCommentMapping: Record<string, any> = {};
     let allPosts: Post[] = [];
+    try {
+      const result = await getConnection()
+        .getRepository(Post)
+        .createQueryBuilder("post")
+        .leftJoinAndMapMany(
+          "post.author",
+          User,
+          "user",
+          "post.authorId=user.id"
+        )
+        .leftJoinAndMapMany(
+          "post.comments",
+          Comment,
+          "comment",
+          "comment.postId=post.id"
+        )
+        .leftJoinAndMapMany(
+          "comment.author",
+          User,
+          "user2",
+          "comment.authorId=user2.id"
+        )
+        .getMany();
 
-    const rawResult: Record<string, any>[] = await getConnection()
-      .getRepository(Post)
-      .createQueryBuilder("p")
-      .leftJoinAndSelect(User, "u", "p.authorId = u.id")
-      .leftJoinAndSelect(Comment, "c", "c.postId = p.id")
-      .getRawMany();
+      result.map((entity: Post) => {
+        //comming as single indexed array containing user object, only object is required
+        entity.author = (entity.author as any)[0];
 
-    if (rawResult) {
-      rawResult.forEach(async (rawObject: Record<string, any>) => {
-        useMapRawResultToEntity(
-          rawObject,
-          currentPostMapping,
-          currentUserMapping,
-          currentCommentMapping
-        );
+        entity.comments?.map((comment: Comment) => {
+          comment.author = (comment.author as any)[0];
+        });
 
-        let currentPostObject = Post.create(currentPostMapping);
-
-        if (currentCommentMapping.id) {
-          let currentCommentObject = Comment.create(currentCommentMapping);
-          (currentPostObject.comments as any) = [{ ...currentCommentObject }];
-        }
-        let currentUserObject = User.create(currentUserMapping);
-        (currentPostObject.author as any) = { ...currentUserObject };
-
-        if (!allPosts.includes(currentPostObject)) {
-          allPosts.push(currentPostObject);
-        }
+        allPosts.push(entity);
       });
+    } catch (error) {
+      console.log(error);
     }
 
     return { posts: allPosts };
@@ -130,10 +130,6 @@ export class PostResolver {
       return isBodyValid as UserResponse;
     }
 
-    let currentPostMapping: Record<string, any> = {};
-    let currentUserMapping: Record<string, any> = {};
-    let currentCommentMapping: Record<string, any> = {};
-
     try {
       const createdPost: Post = await Post.create({
         headline,
@@ -152,22 +148,24 @@ export class PostResolver {
       }
 
       try {
-        const rawResult = await getConnection()
+        const result = await getConnection()
           .getRepository(Post)
-          .createQueryBuilder("p")
-          .leftJoinAndSelect(User, "u", "p.authorId = u.id")
-          .leftJoinAndSelect(Comment, "c", "c.postId = p.id")
-          .where(`p.id = ${createdPost.id.toString()}`)
-          .getRawMany();
+          .createQueryBuilder("post")
+          .where("post.id=:postId", { postId: createdPost.id })
+          .leftJoinAndMapMany(
+            "post.author",
+            User,
+            "user",
+            "post.authorId=user.id"
+          )
+          .getOne();
 
-        if (rawResult && rawResult[0]) {
-          useMapRawResultToEntity(
-            rawResult,
-            currentPostMapping,
-            currentUserMapping,
-            currentCommentMapping
-          );
+        //comming as single indexed array containing user object, only object is required
+        if (result?.author) {
+          result.author = (result.author as any)[0];
         }
+
+        return { posts: [result as Post] };
       } catch (error) {
         return {
           errors: [
@@ -178,26 +176,6 @@ export class PostResolver {
           ],
         };
       }
-      const postObject = await Post.create(currentPostMapping);
-
-      if (currentCommentMapping.id) {
-        const commentObject = await Comment.create(currentCommentMapping);
-
-        commentObject.author = (await User.findOne(
-          commentObject.authorId
-        )) as User;
-        (postObject.comments as any) = [{ ...commentObject }];
-      }
-
-      const userObject = await User.create(currentUserMapping);
-
-      (postObject.author as any) = { ...userObject };
-
-      console.log({ posts: [postObject] });
-
-      return {
-        posts: [postObject],
-      };
     } catch (error) {
       return {
         errors: [

@@ -5,6 +5,7 @@ import {
   CreateDateColumn,
   Entity,
   JoinColumn,
+  OneToMany,
   OneToOne,
   PrimaryColumn,
   PrimaryGeneratedColumn,
@@ -33,13 +34,7 @@ export class Comment extends BaseEntity {
   authorId!: number;
 
   @Field(() => User, { nullable: true })
-  @OneToOne(() => Post, (post) => post.id)
-  @JoinColumn({ name: "id" })
   author?: User;
-
-  @OneToOne(() => User, (user) => user.id)
-  @JoinColumn({ name: "id" })
-  post!: Post;
 
   @Field()
   @CreateDateColumn()

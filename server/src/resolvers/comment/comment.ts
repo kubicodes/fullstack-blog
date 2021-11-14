@@ -1,15 +1,16 @@
-import { Arg, Ctx, Mutation, Resolver, UseMiddleware } from "type-graphql";
+import { Arg, Ctx, Int, Mutation, Resolver } from "type-graphql";
+import { getConnection } from "typeorm";
 import { Comment } from "../../entities/Comment";
-import { isAuth } from "../../middleware/isAuth";
+import { User } from "../../entities/User";
 import { CommentResponse } from "../types/CommentResponse";
 import { CustomContext } from "../types/CustomContext";
 
 @Resolver(Comment)
 export class CommentResolver {
   @Mutation(() => CommentResponse)
-  @UseMiddleware(isAuth)
+  // @UseMiddleware(isAuth)
   async createComment(
-    @Arg("postId") postId: number,
+    @Arg("postId", () => Int) postId: number,
     @Arg("body") body: string,
     @Ctx() { req }: CustomContext
   ): Promise<CommentResponse> {
@@ -37,7 +38,28 @@ export class CommentResolver {
         body,
         postId,
       }).save();
+
+      const currentUserId = req.session?.userId;
+
+      if (!currentUserId) {
+        throw new Error("Not Authenticated");
+      }
+
+      const authorObject = await User.findOne(currentUserId);
+
+      if (!authorObject) {
+        return {
+          errors: [
+            {
+              message: "Could not create Comment",
+            },
+          ],
+        };
+      }
+
+      createdComment.author = authorObject;
     } catch (error) {
+      console.log(error);
       return {
         errors: [
           {
