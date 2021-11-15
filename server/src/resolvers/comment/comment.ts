@@ -1,14 +1,15 @@
-import { Arg, Ctx, Int, Mutation, Resolver } from "type-graphql";
+import { Arg, Ctx, Int, Mutation, Resolver, UseMiddleware } from "type-graphql";
 import { getConnection } from "typeorm";
 import { Comment } from "../../entities/Comment";
 import { User } from "../../entities/User";
+import { isAuth } from "../../middleware/isAuth";
 import { CommentResponse } from "../types/CommentResponse";
 import { CustomContext } from "../types/CustomContext";
 
 @Resolver(Comment)
 export class CommentResolver {
   @Mutation(() => CommentResponse)
-  // @UseMiddleware(isAuth)
+  @UseMiddleware(isAuth)
   async createComment(
     @Arg("postId", () => Int) postId: number,
     @Arg("body") body: string,

@@ -52,7 +52,11 @@ const Post = () => {
             Comment Now
           </Button>
           <Box mt={5} />
-          <CreateComment show={showCommentSection} />
+          <CreateComment
+            show={showCommentSection}
+            setShow={setShowCommentSection}
+            postId={postIdAsInt}
+          />
         </>
       ) : null}
     </Layout>
