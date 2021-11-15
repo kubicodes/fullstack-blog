@@ -46,6 +46,7 @@ const Post = () => {
         ) : (
           <CommentSection
             key={index}
+            postId={post.id}
             comments={post.comments}
             meId={meData.me?.users[0]?.id}
           />

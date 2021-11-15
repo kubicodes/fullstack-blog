@@ -1,20 +1,46 @@
 import { DeleteIcon, EditIcon } from "@chakra-ui/icons";
-import { Box, Link, Stack, Wrap, WrapItem, Text, Flex } from "@chakra-ui/react";
+import { Box, Flex, Link, Stack, Text, Wrap, WrapItem } from "@chakra-ui/react";
 import React from "react";
 import {
   CommentSnippetFragment,
-  MeQuery,
-  MeQueryResult,
-  UserResponse,
+  useDeleteCommentMutation,
 } from "../generated/graphql";
 import BlogAuthor from "./BlogAuthor";
 
 type CommentSectionProps = {
   comments: CommentSnippetFragment[];
   meId: number;
+  postId: number;
 };
 
-const CommentSection: React.FC<CommentSectionProps> = ({ comments, meId }) => {
+const CommentSection: React.FC<CommentSectionProps> = ({
+  comments,
+  meId,
+  postId,
+}) => {
+  const [deleteComment] = useDeleteCommentMutation();
+
+  const handleCommentDelete = async (commentId: number, postId: number) => {
+    if (!commentId || !postId) {
+      return;
+    }
+
+    const deleteConfirmation = confirm(
+      `Do you want to delete the post with the Id ${commentId}`
+    );
+
+    if (deleteConfirmation) {
+      await deleteComment({
+        variables: { commentId },
+        update: (cache) => {
+          const evictResult = cache.evict({
+            fieldName: `posts({"postId":${postId}})`,
+          });
+        },
+      });
+    }
+  };
+
   return (
     <>
       {comments.map((comment) => (
@@ -48,25 +74,29 @@ const CommentSection: React.FC<CommentSectionProps> = ({ comments, meId }) => {
             {comment.author.id !== meId ? null : (
               <Flex>
                 <EditIcon mt={1} mb={1} verticalAlign={"center"} />
-                <Text
-                  alignItems={"center"}
-                  display={"flex"}
-                  flex={1}
-                  pl={3}
-                  fontWeight={"medium"}
-                >
-                  Edit
-                </Text>
+                <Link onClick={() => console.log("edit clicked")}>
+                  <Text
+                    alignItems={"center"}
+                    display={"flex"}
+                    flex={1}
+                    pl={3}
+                    fontWeight={"medium"}
+                  >
+                    Edit
+                  </Text>
+                </Link>
                 <DeleteIcon mt={1} mb={1} ml={8} verticalAlign={"center"} />
-                <Text
-                  alignItems={"center"}
-                  display={"flex"}
-                  flex={1}
-                  pl={3}
-                  fontWeight={"medium"}
-                >
-                  Delete
-                </Text>
+                <Link onClick={() => handleCommentDelete(comment.id, postId)}>
+                  <Text
+                    alignItems={"center"}
+                    display={"flex"}
+                    flex={1}
+                    pl={3}
+                    fontWeight={"medium"}
+                  >
+                    Delete
+                  </Text>
+                </Link>
               </Flex>
             )}
           </Wrap>
