@@ -35,7 +35,7 @@ export class CommentResolver {
     let createdComment;
     try {
       createdComment = await Comment.create({
-        authorId: 61,
+        authorId: req.session.userId,
         body,
         postId,
       }).save();
