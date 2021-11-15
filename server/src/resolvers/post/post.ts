@@ -49,6 +49,7 @@ export class PostResolver {
             "user2",
             "comment.authorId=user2.id"
           )
+          .orderBy("comment.createdAt", "DESC")
           .getOne();
 
         //comming as single indexed array containing user object, only object is required
@@ -94,6 +95,7 @@ export class PostResolver {
           "user2",
           "comment.authorId=user2.id"
         )
+        .orderBy("post.createdAt", "DESC")
         .getMany();
 
       result.map((entity: Post) => {
