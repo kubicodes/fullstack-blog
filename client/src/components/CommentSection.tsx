@@ -1,11 +1,12 @@
 import { DeleteIcon, EditIcon } from "@chakra-ui/icons";
 import { Box, Flex, Link, Stack, Text, Wrap, WrapItem } from "@chakra-ui/react";
-import React from "react";
+import React, { useState } from "react";
 import {
   CommentSnippetFragment,
   useDeleteCommentMutation,
 } from "../generated/graphql";
 import BlogAuthor from "./BlogAuthor";
+import EditComment from "./EditComment";
 
 type CommentSectionProps = {
   comments: CommentSnippetFragment[];
@@ -19,6 +20,9 @@ const CommentSection: React.FC<CommentSectionProps> = ({
   postId,
 }) => {
   const [deleteComment] = useDeleteCommentMutation();
+
+  const [show, setShow] = useState(false);
+  const [clickedCommentId, setClickedCommentId] = useState(0);
 
   const handleCommentDelete = async (commentId: number, postId: number) => {
     if (!commentId || !postId) {
@@ -71,10 +75,10 @@ const CommentSection: React.FC<CommentSectionProps> = ({
                 />
               </Box>
             </WrapItem>
-            {comment.author.id !== meId ? null : (
+            {comment.author?.id !== meId ? null : (
               <Flex>
                 <EditIcon mt={1} mb={1} verticalAlign={"center"} />
-                <Link onClick={() => console.log("edit clicked")}>
+                <Link onClick={() => setClickedCommentId(comment.id)}>
                   <Text
                     alignItems={"center"}
                     display={"flex"}
@@ -100,6 +104,15 @@ const CommentSection: React.FC<CommentSectionProps> = ({
               </Flex>
             )}
           </Wrap>
+          {meId === comment.authorId ? (
+            <EditComment
+              show={comment.id === clickedCommentId ? true : false}
+              setClickedCommentId={setClickedCommentId}
+              postId={postId}
+              commentId={comment.id}
+              commentBody={comment.body}
+            />
+          ) : null}
         </Stack>
       ))}
     </>

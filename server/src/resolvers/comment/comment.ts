@@ -89,4 +89,62 @@ export class CommentResolver {
       return false;
     }
   }
+
+  @Mutation(() => CommentResponse)
+  @UseMiddleware(isAuth)
+  async updateComment(
+    @Arg("commentId", () => Int) commentId: number,
+    @Arg("body") body: string,
+    @Ctx() { req }: CustomContext
+  ): Promise<CommentResponse> {
+    if (!commentId) {
+      return {
+        errors: [
+          {
+            message: "CommentId cannot be empty",
+          },
+        ],
+      };
+    }
+
+    if (!body || body.length < 5) {
+      return {
+        errors: [
+          {
+            field: "body",
+            message: "A comment must be at least 5 characters long",
+          },
+        ],
+      };
+    }
+
+    try {
+      const matchedComment = await Comment.findOne(commentId);
+
+      if (!matchedComment) {
+        return {
+          errors: [
+            {
+              field: "commentId",
+              message: "No Comment found with this ID",
+            },
+          ],
+        };
+      }
+
+      if (req.session.userId !== matchedComment.authorId) {
+        throw new Error("not authenticated");
+      }
+
+      await Comment.update({ id: commentId }, { body });
+
+      const updatedComment = await Comment.findOne(commentId);
+
+      return {
+        comments: [{ ...updatedComment }] as any,
+      };
+    } catch (error) {
+      return { errors: [{ message: "Internal Server Error" }] };
+    }
+  }
 }

@@ -1,0 +1,20 @@
+mutation UpdateComment($commentId: Int!, $body: String!) {
+  updateComment(commentId: $commentId, body: $body) {
+    comments {
+      id
+      body
+      authorId
+      author {
+        id
+        email
+        username
+      }
+      createdAt
+      updatedAt
+    }
+    errors {
+      field
+      message
+    }
+  }
+}

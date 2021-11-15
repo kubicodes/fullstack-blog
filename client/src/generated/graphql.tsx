@@ -61,6 +61,7 @@ export type Mutation = {
   login: UserResponse;
   logout: Scalars['Boolean'];
   register: UserResponse;
+  updateComment: CommentResponse;
   updatePost: PostResponse;
   updateRole: SingleRoleResponse;
 };
@@ -108,6 +109,12 @@ export type MutationRegisterArgs = {
   password: Scalars['String'];
   role: Scalars['Int'];
   username: Scalars['String'];
+};
+
+
+export type MutationUpdateCommentArgs = {
+  body: Scalars['String'];
+  commentId: Scalars['Int'];
 };
 
 
@@ -264,6 +271,14 @@ export type RegisterMutationVariables = Exact<{
 
 
 export type RegisterMutation = { __typename?: 'Mutation', register: { __typename?: 'UserResponse', users?: Array<{ __typename?: 'UserType', id: number, email: string, username: string, createdAt: any, updatedAt: any }> | null | undefined, errors?: Array<{ __typename?: 'FieldError', field?: string | null | undefined, message?: string | null | undefined }> | null | undefined } };
+
+export type UpdateCommentMutationVariables = Exact<{
+  commentId: Scalars['Int'];
+  body: Scalars['String'];
+}>;
+
+
+export type UpdateCommentMutation = { __typename?: 'Mutation', updateComment: { __typename?: 'CommentResponse', comments?: Array<{ __typename?: 'Comment', id: number, body: string, authorId: number, createdAt: any, updatedAt: any, author?: { __typename?: 'User', id: number, email: string, username: string } | null | undefined }> | null | undefined, errors?: Array<{ __typename?: 'FieldError', field?: string | null | undefined, message?: string | null | undefined }> | null | undefined } };
 
 export type UpdatePostMutationVariables = Exact<{
   body: Scalars['String'];
@@ -619,6 +634,55 @@ export function useRegisterMutation(baseOptions?: Apollo.MutationHookOptions<Reg
 export type RegisterMutationHookResult = ReturnType<typeof useRegisterMutation>;
 export type RegisterMutationResult = Apollo.MutationResult<RegisterMutation>;
 export type RegisterMutationOptions = Apollo.BaseMutationOptions<RegisterMutation, RegisterMutationVariables>;
+export const UpdateCommentDocument = gql`
+    mutation UpdateComment($commentId: Int!, $body: String!) {
+  updateComment(commentId: $commentId, body: $body) {
+    comments {
+      id
+      body
+      authorId
+      author {
+        id
+        email
+        username
+      }
+      createdAt
+      updatedAt
+    }
+    errors {
+      field
+      message
+    }
+  }
+}
+    `;
+export type UpdateCommentMutationFn = Apollo.MutationFunction<UpdateCommentMutation, UpdateCommentMutationVariables>;
+
+/**
+ * __useUpdateCommentMutation__
+ *
+ * To run a mutation, you first call `useUpdateCommentMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useUpdateCommentMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [updateCommentMutation, { data, loading, error }] = useUpdateCommentMutation({
+ *   variables: {
+ *      commentId: // value for 'commentId'
+ *      body: // value for 'body'
+ *   },
+ * });
+ */
+export function useUpdateCommentMutation(baseOptions?: Apollo.MutationHookOptions<UpdateCommentMutation, UpdateCommentMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<UpdateCommentMutation, UpdateCommentMutationVariables>(UpdateCommentDocument, options);
+      }
+export type UpdateCommentMutationHookResult = ReturnType<typeof useUpdateCommentMutation>;
+export type UpdateCommentMutationResult = Apollo.MutationResult<UpdateCommentMutation>;
+export type UpdateCommentMutationOptions = Apollo.BaseMutationOptions<UpdateCommentMutation, UpdateCommentMutationVariables>;
 export const UpdatePostDocument = gql`
     mutation UpdatePost($body: String!, $headline: String!, $postId: Int!) {
   updatePost(postId: $postId, body: $body, headline: $headline) {

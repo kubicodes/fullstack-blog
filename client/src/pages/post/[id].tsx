@@ -7,10 +7,8 @@ import CommentSection from "../../components/CommentSection";
 import CreateComment from "../../components/CreateComment";
 import { Layout } from "../../components/Layout";
 import {
-  MeQuery,
-  MeQueryResult,
   useMeQuery,
-  usePostsQuery,
+  usePostsQuery
 } from "../../generated/graphql";
 import { withApollo } from "../../utils/withApollo";
 
@@ -48,7 +46,7 @@ const Post = () => {
             key={index}
             postId={post.id}
             comments={post.comments}
-            meId={meData.me?.users[0]?.id}
+            meId={meData.me?.users[0].id}
           />
         )
       )}
