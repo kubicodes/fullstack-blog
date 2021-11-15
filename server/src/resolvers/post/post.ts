@@ -270,6 +270,7 @@ export class PostResolver {
 
     try {
       await Post.delete({ id: postId });
+      await Comment.delete({ postId: matchedPost.id });
     } catch (error) {
       return { errors: [{ message: "Error while deleting Post" }] };
     }
