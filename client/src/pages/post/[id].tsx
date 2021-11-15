@@ -6,7 +6,12 @@ import BlogPost from "../../components/BlogPost";
 import CommentSection from "../../components/CommentSection";
 import CreateComment from "../../components/CreateComment";
 import { Layout } from "../../components/Layout";
-import { useMeQuery, usePostsQuery } from "../../generated/graphql";
+import {
+  MeQuery,
+  MeQueryResult,
+  useMeQuery,
+  usePostsQuery,
+} from "../../generated/graphql";
 import { withApollo } from "../../utils/withApollo";
 
 const Post = () => {
@@ -39,7 +44,11 @@ const Post = () => {
         !post.comments ? (
           <Text mt={5}>There are no comments yet</Text>
         ) : (
-          <CommentSection key={index} comments={post.comments} />
+          <CommentSection
+            key={index}
+            comments={post.comments}
+            meId={meData.me?.users[0]?.id}
+          />
         )
       )}
       {!meDataLoading && meData.me ? (

@@ -4,6 +4,7 @@ fragment CommentSnippet on Comment {
   postId
   authorId
   author {
+    id
     username
   }
   createdAt

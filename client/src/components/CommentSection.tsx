@@ -1,13 +1,20 @@
-import { Box, Link, Stack, Wrap, WrapItem, Text } from "@chakra-ui/react";
+import { DeleteIcon, EditIcon } from "@chakra-ui/icons";
+import { Box, Link, Stack, Wrap, WrapItem, Text, Flex } from "@chakra-ui/react";
 import React from "react";
-import { CommentSnippetFragment } from "../generated/graphql";
+import {
+  CommentSnippetFragment,
+  MeQuery,
+  MeQueryResult,
+  UserResponse,
+} from "../generated/graphql";
 import BlogAuthor from "./BlogAuthor";
 
 type CommentSectionProps = {
   comments: CommentSnippetFragment[];
+  meId: number;
 };
 
-const CommentSection: React.FC<CommentSectionProps> = ({ comments }) => {
+const CommentSection: React.FC<CommentSectionProps> = ({ comments, meId }) => {
   return (
     <>
       {comments.map((comment) => (
@@ -38,6 +45,30 @@ const CommentSection: React.FC<CommentSectionProps> = ({ comments }) => {
                 />
               </Box>
             </WrapItem>
+            {comment.author.id !== meId ? null : (
+              <Flex>
+                <EditIcon mt={1} mb={1} verticalAlign={"center"} />
+                <Text
+                  alignItems={"center"}
+                  display={"flex"}
+                  flex={1}
+                  pl={3}
+                  fontWeight={"medium"}
+                >
+                  Edit
+                </Text>
+                <DeleteIcon mt={1} mb={1} ml={8} verticalAlign={"center"} />
+                <Text
+                  alignItems={"center"}
+                  display={"flex"}
+                  flex={1}
+                  pl={3}
+                  fontWeight={"medium"}
+                >
+                  Delete
+                </Text>
+              </Flex>
+            )}
           </Wrap>
         </Stack>
       ))}

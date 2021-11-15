@@ -5,6 +5,7 @@ import NextLink from "next/link";
 import React from "react";
 import { useDeletePostMutation, useMeQuery } from "../generated/graphql";
 import BlogAuthor from "./BlogAuthor";
+import DeleteAndEditButtons from "./DeleteAndEditButtons";
 
 type BlogArticle = {
   id: number;
@@ -93,43 +94,11 @@ const BlogArticle: React.FC<BlogArticle> = ({
             </Flex>
             <BlogAuthor name={author} date={new Date(`${createdAt}`)} />
             {meDataLoading || meData.me?.users[0].id !== authorId ? null : (
-              <Flex>
-                <EditIcon mt={4} mb={4} verticalAlign={"center"} />
-                <NextLink href="/post/edit/[id]" as={`/post/edit/${id}`}>
-                  <Link
-                    mt={3}
-                    textDecoration="none"
-                    _hover={{ textDecoration: "none" }}
-                  >
-                    <Text
-                      alignItems={"center"}
-                      display={"flex"}
-                      flex={1}
-                      pl={3}
-                      fontWeight={"medium"}
-                    >
-                      Edit
-                    </Text>
-                  </Link>
-                </NextLink>
-                <DeleteIcon mt={4} mb={4} ml={8} verticalAlign={"center"} />
-                <Link
-                  mt={3}
-                  textDecoration="none"
-                  _hover={{ textDecoration: "none" }}
-                  onClick={handleDelete}
-                >
-                  <Text
-                    alignItems={"center"}
-                    display={"flex"}
-                    flex={1}
-                    pl={3}
-                    fontWeight={"medium"}
-                  >
-                    Delete
-                  </Text>
-                </Link>
-              </Flex>
+              <DeleteAndEditButtons
+                handleDelete={handleDelete}
+                linkHref={"/post/edit/[id]"}
+                linkAs={`/post/edit/[id]ost/edit/${id}`}
+              />
             )}
           </Box>
         </WrapItem>
