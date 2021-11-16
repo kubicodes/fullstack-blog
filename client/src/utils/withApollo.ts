@@ -1,6 +1,7 @@
 import { ApolloClient, InMemoryCache } from "@apollo/client";
 import { NextPageContext } from "next";
 import { withApollo as createWithApollo } from "next-apollo";
+import { Post, PostResponse } from "../generated/graphql";
 
 const client = (ctx: NextPageContext) =>
   new ApolloClient({
@@ -11,7 +12,26 @@ const client = (ctx: NextPageContext) =>
         (typeof window == "undefined" ? ctx?.req?.headers.cookie : undefined) ||
         "",
     },
-    cache: new InMemoryCache(),
+    cache: new InMemoryCache({
+      typePolicies: {
+        Query: {
+          fields: {
+            posts: {
+              keyArgs: [],
+              merge(
+                existing: PostResponse | undefined,
+                incoming: PostResponse
+              ): PostResponse {
+                return {
+                  ...incoming,
+                  posts: [...(existing?.posts || []), ...incoming.posts],
+                };
+              },
+            },
+          },
+        },
+      },
+    }),
   });
 
 export const withApollo = createWithApollo(client);

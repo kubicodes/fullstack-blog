@@ -23,57 +23,11 @@ import { useIsHeadlineValid } from "./utils/useIsHeadlineValid";
 export class PostResolver {
   @Query(() => PostResponse)
   async posts(
-    @Arg("postId", () => Int, { nullable: true }) postId?: number
+    @Arg("limit", () => Int, { nullable: true }) limit?: number,
+    @Arg("offset", () => Int, { nullable: true }) offset?: number
   ): Promise<PostResponse> {
-    if (postId) {
-      try {
-        const result = await getConnection()
-          .getRepository(Post)
-          .createQueryBuilder("post")
-          .where("post.id=:postId", { postId })
-          .leftJoinAndMapMany(
-            "post.author",
-            User,
-            "user",
-            "post.authorId=user.id"
-          )
-          .leftJoinAndMapMany(
-            "post.comments",
-            Comment,
-            "comment",
-            "comment.postId=post.id"
-          )
-          .leftJoinAndMapMany(
-            "comment.author",
-            User,
-            "user2",
-            "comment.authorId=user2.id"
-          )
-          .orderBy("comment.createdAt", "DESC")
-          .getOne();
-
-        //comming as single indexed array containing user object, only object is required
-        if (result?.author) {
-          result.author = (result.author as any)[0];
-        }
-
-        if (
-          result?.comments?.map((comment: Comment) => {
-            comment.author = (comment.author as any)[0];
-          })
-        )
-          return { posts: [result as Post] };
-      } catch (error) {
-        return {
-          errors: [
-            { field: "postId", message: `No Post found with ID ${postId}` },
-          ],
-        };
-      }
-    }
-
-    let allPosts: Post[] = [];
     try {
+      let allPosts: Post[] = [];
       const result = await getConnection()
         .getRepository(Post)
         .createQueryBuilder("post")
@@ -95,6 +49,8 @@ export class PostResolver {
           "user2",
           "comment.authorId=user2.id"
         )
+        .skip(offset)
+        .take(limit)
         .orderBy("post.createdAt", "DESC")
         .getMany();
 
@@ -108,11 +64,65 @@ export class PostResolver {
 
         allPosts.push(entity);
       });
+
+      return { posts: [...allPosts] };
     } catch (error) {
       console.log(error);
+      return { errors: [{ message: "Internal Server Error" }] };
     }
+  }
+  @Query(() => PostResponse)
+  async post(@Arg("postId", () => Int) postId: number): Promise<PostResponse> {
+    if (!postId) {
+      return {
+        errors: [{ field: "postId", message: "Post ID cannot be empty" }],
+      };
+    }
+    try {
+      const result = await getConnection()
+        .getRepository(Post)
+        .createQueryBuilder("post")
+        .where("post.id=:postId", { postId })
+        .leftJoinAndMapMany(
+          "post.author",
+          User,
+          "user",
+          "post.authorId=user.id"
+        )
+        .leftJoinAndMapMany(
+          "post.comments",
+          Comment,
+          "comment",
+          "comment.postId=post.id"
+        )
+        .leftJoinAndMapMany(
+          "comment.author",
+          User,
+          "user2",
+          "comment.authorId=user2.id"
+        )
+        .orderBy("comment.createdAt", "DESC")
+        .getOne();
 
-    return { posts: allPosts };
+      //comming as single indexed array containing user object, only object is required
+      if (result?.author) {
+        result.author = (result.author as any)[0];
+      }
+
+      if (result?.comments) {
+        result?.comments?.map((comment: Comment) => {
+          comment.author = (comment.author as any)[0];
+        });
+      }
+
+      return { posts: [result as Post] };
+    } catch (error) {
+      return {
+        errors: [
+          { field: "postId", message: `No Post found with ID ${postId}` },
+        ],
+      };
+    }
   }
 
   @Mutation(() => PostResponse)

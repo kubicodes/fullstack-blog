@@ -6,7 +6,7 @@ import InputField from "../../../components/InputField";
 import { Layout } from "../../../components/Layout";
 import {
   useMeQuery,
-  usePostsQuery,
+  usePostQuery,
   useUpdatePostMutation,
 } from "../../../generated/graphql";
 import { errorMap } from "../../../utils/errorMap";
@@ -23,7 +23,7 @@ const EditPost = () => {
   const [updatePost] = useUpdatePostMutation();
 
   const postId = parseInt(router.query.id as string);
-  const { data: postData, loading: postLoading } = usePostsQuery({
+  const { data: postData, loading: postLoading } = usePostQuery({
     variables: { postId },
   });
 
@@ -74,8 +74,8 @@ const EditPost = () => {
       <Heading fontSize="xl">Create Post</Heading>
       <Formik
         initialValues={{
-          headline: postData.posts?.posts[0].headline,
-          body: postData.posts?.posts[0].body,
+          headline: postData.post?.posts[0]?.headline,
+          body: postData.post?.posts[0]?.body,
         }}
         onSubmit={handleSubmit}
       >

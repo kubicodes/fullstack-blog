@@ -1,5 +1,5 @@
-import { Button, Heading } from "@chakra-ui/react";
-import React from "react";
+import { Button, Flex, Heading } from "@chakra-ui/react";
+import React, { useEffect, useState } from "react";
 import BlogPost from "../components/BlogPost";
 import { Layout } from "../components/Layout";
 import { useMeQuery, usePostsQuery } from "../generated/graphql";
@@ -7,7 +7,21 @@ import { withApollo } from "../utils/withApollo";
 import NextLink from "next/link";
 
 const Index = () => {
-  const { data: blogPosts, loading, error } = usePostsQuery();
+  const paginationLimit = 5;
+
+  const [paginationOffset, setPaginationOffset] = useState(0);
+
+  const {
+    data: blogPosts,
+    loading,
+    error,
+    fetchMore,
+    variables,
+  } = usePostsQuery({
+    variables: { limit: paginationLimit, offset: paginationOffset },
+    notifyOnNetworkStatusChange: true,
+  });
+
   const { data: meData } = useMeQuery();
   if (!loading && !blogPosts) {
     return (
@@ -37,6 +51,25 @@ const Index = () => {
       {blogPosts.posts.posts.map((post) => (
         <BlogPost key={post.id} blogPost={post} />
       ))}
+      <Flex>
+        <Button
+          colorScheme={"twitter"}
+          m={"auto"}
+          mt={8}
+          mb={8}
+          onClick={() => {
+            setPaginationOffset(paginationOffset + paginationLimit);
+            fetchMore({
+              variables: {
+                limit: variables?.limit,
+                offset: variables?.offset + paginationLimit,
+              },
+            });
+          }}
+        >
+          Fetch More
+        </Button>
+      </Flex>
     </Layout>
   );
 };

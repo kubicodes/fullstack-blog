@@ -33,12 +33,10 @@ const EditComment: React.FC<EditCommentProps> = ({
       variables: { commentId, body: values.body },
       update: (cache) => {
         cacheDeleteResult = cache.evict({
-          fieldName: `posts({"postId":${postId}})`,
+          fieldName: `posts:{}`,
         });
       },
     });
-
-    console.log(response);
 
     if (response.data.updateComment?.errors) {
       const formikFormattedErrors: Record<string, string> = errorMap(
@@ -48,7 +46,6 @@ const EditComment: React.FC<EditCommentProps> = ({
       setErrors(formikFormattedErrors);
     }
 
-    console.log(cacheDeleteResult);
     if (cacheDeleteResult) {
       setClickedCommentId(0);
     }

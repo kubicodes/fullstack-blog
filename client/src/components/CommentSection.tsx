@@ -37,9 +37,7 @@ const CommentSection: React.FC<CommentSectionProps> = ({
       await deleteComment({
         variables: { commentId },
         update: (cache) => {
-          const evictResult = cache.evict({
-            fieldName: `posts({"postId":${postId}})`,
-          });
+          const evictResult = cache.evict({ fieldName: "posts:{}" });
         },
       });
     }

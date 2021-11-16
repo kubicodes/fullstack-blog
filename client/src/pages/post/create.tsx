@@ -31,7 +31,7 @@ const CreatePost = () => {
         body: values.body,
       },
       update: (cache) => {
-        cache.evict({ fieldName: "posts({})" });
+        cache.evict({ fieldName: "posts:{}" });
       },
     });
 

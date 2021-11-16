@@ -6,10 +6,7 @@ import BlogPost from "../../components/BlogPost";
 import CommentSection from "../../components/CommentSection";
 import CreateComment from "../../components/CreateComment";
 import { Layout } from "../../components/Layout";
-import {
-  useMeQuery,
-  usePostsQuery
-} from "../../generated/graphql";
+import { useMeQuery, usePostQuery, usePostsQuery } from "../../generated/graphql";
 import { withApollo } from "../../utils/withApollo";
 
 const Post = () => {
@@ -19,7 +16,7 @@ const Post = () => {
   const { data: meData, loading: meDataLoading } = useMeQuery();
   const [showCommentSection, setShowCommentSection] = useState(false);
 
-  const { data, loading, error } = usePostsQuery({
+  const { data, loading, error } = usePostQuery({
     variables: { postId: postIdAsInt },
   });
 
@@ -33,12 +30,12 @@ const Post = () => {
 
   return (
     <Layout>
-      <BlogPost blogPost={data.posts.posts[0]} />
+      <BlogPost blogPost={data.post.posts[0]} />
       <Divider />
       <Heading fontSize="large" mt={12}>
         Comments
       </Heading>
-      {data.posts.posts.map((post, index) =>
+      {data.post.posts.map((post, index) =>
         !post.comments ? (
           <Text mt={5}>There are no comments yet</Text>
         ) : (

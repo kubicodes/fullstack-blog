@@ -46,16 +46,14 @@ const BlogArticle: React.FC<BlogArticle> = ({
           postId: id,
         },
         update: (cache) => {
-          cache.evict({ fieldName: "posts({})" });
+          cache.evict({ fieldName: "posts:{}" });
         },
       });
 
       if (deletePostResult.errors) {
         alert(deletePostResult.errors[0].message);
       }
-    } else {
-      console.log("not confirmed");
-    }
+    } 
   };
 
   return (
@@ -97,7 +95,7 @@ const BlogArticle: React.FC<BlogArticle> = ({
               <DeleteAndEditButtons
                 handleDelete={handleDelete}
                 linkHref={"/post/edit/[id]"}
-                linkAs={`/post/edit/[id]ost/edit/${id}`}
+                linkAs={`/post/edit/${id}`}
               />
             )}
           </Box>

@@ -50,7 +50,6 @@ const Register = () => {
       },
     });
 
-    console.log(response);
     if (response.data?.login.errors) {
       const formikFormattedErrors: Record<string, string> = errorMap(
         response.data.login.errors
