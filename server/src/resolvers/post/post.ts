@@ -26,9 +26,11 @@ export class PostResolver {
     @Arg("limit", () => Int, { nullable: true }) limit?: number,
     @Arg("offset", () => Int, { nullable: true }) offset?: number
   ): Promise<PostResponse> {
+    console.log("limit ", limit);
+    console.log("offset ", offset);
     try {
       let allPosts: Post[] = [];
-      const result = await getConnection()
+      const fullResult = await getConnection()
         .getRepository(Post)
         .createQueryBuilder("post")
         .leftJoinAndMapMany(
@@ -48,7 +50,9 @@ export class PostResolver {
           User,
           "user2",
           "comment.authorId=user2.id"
-        )
+        );
+
+      const result = await fullResult
         .skip(offset)
         .take(limit)
         .orderBy("post.createdAt", "DESC")
@@ -64,6 +68,13 @@ export class PostResolver {
 
         allPosts.push(entity);
       });
+
+      if (limit && offset !== undefined) {
+        const maxCurrentlyShowing = limit + offset;
+        const lengthOfAllPosts = await fullResult.getCount();
+        const hasMore = lengthOfAllPosts > maxCurrentlyShowing;
+        return { posts: [...allPosts], hasMore };
+      }
 
       return { posts: [...allPosts] };
     } catch (error) {

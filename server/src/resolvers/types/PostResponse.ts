@@ -7,6 +7,9 @@ export class PostResponse {
   @Field(() => [Post], { nullable: true })
   posts?: Post[];
 
+  @Field(() => Boolean, { nullable: true })
+  hasMore?: boolean;
+
   @Field(() => [FieldError], { nullable: true })
   errors?: FieldError[];
 }

@@ -144,6 +144,7 @@ export type Post = {
 export type PostResponse = {
   __typename?: 'PostResponse';
   errors?: Maybe<Array<FieldError>>;
+  hasMore?: Maybe<Scalars['Boolean']>;
   posts?: Maybe<Array<Post>>;
 };
 
@@ -314,7 +315,7 @@ export type PostsQueryVariables = Exact<{
 }>;
 
 
-export type PostsQuery = { __typename?: 'Query', posts: { __typename?: 'PostResponse', posts?: Array<{ __typename?: 'Post', id: number, body: string, headline: string, createdAt: any, updatedAt: any, author: { __typename?: 'User', id: number, email: string, username: string, createdAt: any, updatedAt: any }, comments?: Array<{ __typename?: 'Comment', id: number, body: string, postId: number, authorId: number, createdAt: any, updatedAt: any, author?: { __typename?: 'User', id: number, username: string } | null | undefined }> | null | undefined }> | null | undefined, errors?: Array<{ __typename?: 'FieldError', field?: string | null | undefined, message?: string | null | undefined }> | null | undefined } };
+export type PostsQuery = { __typename?: 'Query', posts: { __typename?: 'PostResponse', hasMore?: boolean | null | undefined, posts?: Array<{ __typename?: 'Post', id: number, body: string, headline: string, createdAt: any, updatedAt: any, author: { __typename?: 'User', id: number, email: string, username: string, createdAt: any, updatedAt: any }, comments?: Array<{ __typename?: 'Comment', id: number, body: string, postId: number, authorId: number, createdAt: any, updatedAt: any, author?: { __typename?: 'User', id: number, username: string } | null | undefined }> | null | undefined }> | null | undefined, errors?: Array<{ __typename?: 'FieldError', field?: string | null | undefined, message?: string | null | undefined }> | null | undefined } };
 
 export type RolesQueryVariables = Exact<{ [key: string]: never; }>;
 
@@ -831,6 +832,7 @@ export const PostsDocument = gql`
     posts {
       ...RegularPostResponse
     }
+    hasMore
     errors {
       ...RegularErrorResponse
     }

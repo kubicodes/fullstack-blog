@@ -3,6 +3,7 @@ query Posts($limit: Int, $offset: Int) {
     posts {
       ...RegularPostResponse
     }
+    hasMore
     errors {
       ...RegularErrorResponse
     }

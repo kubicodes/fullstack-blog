@@ -51,25 +51,27 @@ const Index = () => {
       {blogPosts.posts.posts.map((post) => (
         <BlogPost key={post.id} blogPost={post} />
       ))}
-      <Flex>
-        <Button
-          colorScheme={"twitter"}
-          m={"auto"}
-          mt={8}
-          mb={8}
-          onClick={() => {
-            setPaginationOffset(paginationOffset + paginationLimit);
-            fetchMore({
-              variables: {
-                limit: variables?.limit,
-                offset: variables?.offset + paginationLimit,
-              },
-            });
-          }}
-        >
-          Fetch More
-        </Button>
-      </Flex>
+      {!blogPosts.posts.hasMore ? null : (
+        <Flex>
+          <Button
+            colorScheme={"twitter"}
+            m={"auto"}
+            mt={8}
+            mb={8}
+            onClick={() => {
+              setPaginationOffset(paginationOffset + paginationLimit);
+              fetchMore({
+                variables: {
+                  limit: variables?.limit,
+                  offset: variables?.offset + paginationLimit,
+                },
+              });
+            }}
+          >
+            Fetch More
+          </Button>
+        </Flex>
+      )}
     </Layout>
   );
 };
