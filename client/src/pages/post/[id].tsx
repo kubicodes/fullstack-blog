@@ -6,7 +6,7 @@ import BlogPost from "../../components/BlogPost";
 import CommentSection from "../../components/CommentSection";
 import CreateComment from "../../components/CreateComment";
 import { Layout } from "../../components/Layout";
-import { useMeQuery, usePostQuery, usePostsQuery } from "../../generated/graphql";
+import { useMeQuery, usePostQuery } from "../../generated/graphql";
 import { withApollo } from "../../utils/withApollo";
 
 const Post = () => {
@@ -36,7 +36,7 @@ const Post = () => {
         Comments
       </Heading>
       {data.post.posts.map((post, index) =>
-        !post.comments ? (
+        !post.comments.length ? (
           <Text mt={5}>There are no comments yet</Text>
         ) : (
           <CommentSection
