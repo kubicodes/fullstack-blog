@@ -13,6 +13,8 @@ import { User } from "../../entities/User";
 import { isAuth } from "../../middleware/isAuth";
 import { CommentResponse } from "../types/CommentResponse";
 import { CustomContext } from "../types/CustomContext";
+import { calculateHasMore } from "../utils/calculateHasMore";
+// import { calculateHasMore } from "../utils/calculateHasMore";
 import { mapAuthorArrayToEntity } from "../utils/mapAuthorArrayToEntity";
 
 @Resolver(Comment)
@@ -159,7 +161,9 @@ export class CommentResolver {
 
   @Query(() => CommentResponse)
   async comments(
-    @Arg("postId", () => Int, { nullable: true }) postId?: number
+    @Arg("postId", () => Int, { nullable: true }) postId?: number,
+    @Arg("limit", () => Int, { nullable: true }) limit?: number,
+    @Arg("offset", () => Int, { nullable: true }) offset?: number
   ): Promise<CommentResponse> {
     if (!postId) {
       return {
@@ -168,7 +172,7 @@ export class CommentResolver {
     }
 
     try {
-      const result = await getConnection()
+      const fullResult = await getConnection()
         .getRepository(Comment)
         .createQueryBuilder("comment")
         .leftJoinAndMapMany(
@@ -177,14 +181,23 @@ export class CommentResolver {
           "user",
           "comment.authorId=user.id"
         )
-        .where("`comment`.`postId`=:postId", { postId })
+        .where("`comment`.`postId`=:postId", { postId });
+
+      const result = await fullResult
+        .skip(offset)
+        .take(limit)
         .orderBy("comment.createdAt", "DESC")
         .getMany();
 
-      mapAuthorArrayToEntity(result);
-
       if (!result) {
         return { comments: [] };
+      }
+
+      mapAuthorArrayToEntity(result);
+
+      if (limit && offset !== undefined) {
+        const hasMore = await calculateHasMore(limit, offset, fullResult);
+        return { comments: [...result], hasMore };
       }
 
       return { comments: [...result] };

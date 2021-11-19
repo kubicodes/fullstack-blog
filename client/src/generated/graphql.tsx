@@ -31,6 +31,7 @@ export type CommentResponse = {
   __typename?: 'CommentResponse';
   comments?: Maybe<Array<Comment>>;
   errors?: Maybe<Array<FieldError>>;
+  hasMore?: Maybe<Scalars['Boolean']>;
 };
 
 export type DeletePostResponse = {
@@ -160,6 +161,8 @@ export type Query = {
 
 
 export type QueryCommentsArgs = {
+  limit?: Maybe<Scalars['Int']>;
+  offset?: Maybe<Scalars['Int']>;
   postId?: Maybe<Scalars['Int']>;
 };
 
@@ -305,10 +308,12 @@ export type UpdatePostMutation = { __typename?: 'Mutation', updatePost: { __type
 
 export type CommentsQueryVariables = Exact<{
   postId: Scalars['Int'];
+  limit?: Maybe<Scalars['Int']>;
+  offset?: Maybe<Scalars['Int']>;
 }>;
 
 
-export type CommentsQuery = { __typename?: 'Query', comments: { __typename?: 'CommentResponse', comments?: Array<{ __typename?: 'Comment', id: number, body: string, postId: number, authorId: number, createdAt: any, updatedAt: any, author?: { __typename?: 'User', id: number, username: string } | null | undefined }> | null | undefined, errors?: Array<{ __typename?: 'FieldError', field?: string | null | undefined, message?: string | null | undefined }> | null | undefined } };
+export type CommentsQuery = { __typename?: 'Query', comments: { __typename?: 'CommentResponse', hasMore?: boolean | null | undefined, comments?: Array<{ __typename?: 'Comment', id: number, body: string, postId: number, authorId: number, createdAt: any, updatedAt: any, author?: { __typename?: 'User', id: number, username: string } | null | undefined }> | null | undefined, errors?: Array<{ __typename?: 'FieldError', field?: string | null | undefined, message?: string | null | undefined }> | null | undefined } };
 
 export type MeQueryVariables = Exact<{ [key: string]: never; }>;
 
@@ -765,11 +770,12 @@ export type UpdatePostMutationHookResult = ReturnType<typeof useUpdatePostMutati
 export type UpdatePostMutationResult = Apollo.MutationResult<UpdatePostMutation>;
 export type UpdatePostMutationOptions = Apollo.BaseMutationOptions<UpdatePostMutation, UpdatePostMutationVariables>;
 export const CommentsDocument = gql`
-    query Comments($postId: Int!) {
-  comments(postId: $postId) {
+    query Comments($postId: Int!, $limit: Int, $offset: Int) {
+  comments(postId: $postId, limit: $limit, offset: $offset) {
     comments {
       ...CommentSnippet
     }
+    hasMore
     errors {
       ...RegularErrorResponse
     }
@@ -791,6 +797,8 @@ ${RegularErrorResponseFragmentDoc}`;
  * const { data, loading, error } = useCommentsQuery({
  *   variables: {
  *      postId: // value for 'postId'
+ *      limit: // value for 'limit'
+ *      offset: // value for 'offset'
  *   },
  * });
  */

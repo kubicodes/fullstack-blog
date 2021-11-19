@@ -27,8 +27,9 @@ const CreateComment: React.FC<CreateCommentProps> = ({
     const { data } = await createComment({
       variables: { postId, body: values.body },
       update: (cache) => {
+        console.log(cache);
         cacheDeleteResult = cache.evict({
-          fieldName: `posts:{}`,
+          fieldName: "comments",
         });
       },
     });

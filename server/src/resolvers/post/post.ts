@@ -5,7 +5,7 @@ import {
   Mutation,
   Query,
   Resolver,
-  UseMiddleware
+  UseMiddleware,
 } from "type-graphql";
 import { getConnection } from "typeorm";
 import { Comment } from "../../entities/Comment";
@@ -16,6 +16,9 @@ import { CustomContext } from "../types/CustomContext";
 import { DeletePostResponse } from "../types/DeletePostResponse";
 import { PostResponse } from "../types/PostResponse";
 import { UserResponse } from "../types/UserResponse";
+import { calculateHasMore } from "../utils/calculateHasMore";
+// import { calculateHasMore } from "../utils/calculateHasMore";
+import { mapAuthorArrayToEntity } from "../utils/mapAuthorArrayToEntity";
 import { useIsBodyValid } from "./utils/useIsBodyValid";
 import { useIsHeadlineValid } from "./utils/useIsHeadlineValid";
 
@@ -27,7 +30,6 @@ export class PostResolver {
     @Arg("offset", () => Int, { nullable: true }) offset?: number
   ): Promise<PostResponse> {
     try {
-      let allPosts: Post[] = [];
       const fullResult = await getConnection()
         .getRepository(Post)
         .createQueryBuilder("post")
@@ -56,25 +58,14 @@ export class PostResolver {
         .orderBy("post.createdAt", "DESC")
         .getMany();
 
-      result.map((entity: Post) => {
-        //comming as single indexed array containing user object, only object is required
-        entity.author = (entity.author as any)[0];
-
-        entity.comments?.map((comment: Comment) => {
-          comment.author = (comment.author as any)[0];
-        });
-
-        allPosts.push(entity);
-      });
+      mapAuthorArrayToEntity(result);
 
       if (limit && offset !== undefined) {
-        const maxCurrentlyShowing = limit + offset;
-        const lengthOfAllPosts = await fullResult.getCount();
-        const hasMore = lengthOfAllPosts > maxCurrentlyShowing;
-        return { posts: [...allPosts], hasMore };
+        const hasMore = await calculateHasMore(limit, offset, fullResult);
+        return { posts: [...result], hasMore };
       }
 
-      return { posts: [...allPosts] };
+      return { posts: [...result] };
     } catch (error) {
       console.log(error);
       return { errors: [{ message: "Internal Server Error" }] };

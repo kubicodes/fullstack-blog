@@ -1,8 +1,9 @@
-query Comments($postId: Int!) {
-  comments(postId: $postId) {
+query Comments($postId: Int!, $limit: Int, $offset: Int) {
+  comments(postId: $postId, limit: $limit, offset: $offset) {
     comments {
       ...CommentSnippet
     }
+    hasMore
     errors {
       ...RegularErrorResponse
     }

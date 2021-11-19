@@ -29,7 +29,7 @@ const client = (ctx: NextPageContext) =>
               },
             },
             comments: {
-              keyArgs: [],
+              keyArgs: false,
               merge(
                 existing: CommentResponse | undefined,
                 incoming: CommentResponse

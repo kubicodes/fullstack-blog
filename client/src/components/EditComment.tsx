@@ -33,7 +33,7 @@ const EditComment: React.FC<EditCommentProps> = ({
       variables: { commentId, body: values.body },
       update: (cache) => {
         cacheDeleteResult = cache.evict({
-          fieldName: `posts:{}`,
+          fieldName: "comments",
         });
       },
     });

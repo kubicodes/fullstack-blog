@@ -1,3 +1,4 @@
+import { useApolloClient } from "@apollo/client";
 import { Button } from "@chakra-ui/button";
 import { Box, Divider, Heading, Text } from "@chakra-ui/layout";
 import { useRouter } from "next/dist/client/router";
@@ -5,6 +6,7 @@ import React, { useState } from "react";
 import BlogPost from "../../components/BlogPost";
 import CommentSection from "../../components/CommentSection";
 import CreateComment from "../../components/CreateComment";
+import FetchMore from "../../components/FetchMore";
 import { Layout } from "../../components/Layout";
 import {
   useCommentsQuery,
@@ -16,6 +18,9 @@ import { withApollo } from "../../utils/withApollo";
 
 const Post: React.FC<{}> = () => {
   const [showCommentSection, setShowCommentSection] = useState(false);
+
+  const commentsPaginationLimit = 5;
+  const [commentsPaginationOffset, setCommentsPaginationOffset] = useState(0);
 
   const router = useRouter();
   const postId = router.query.id;
@@ -32,8 +37,14 @@ const Post: React.FC<{}> = () => {
     data: commentsData,
     loading: commnentsLoading,
     error: commentsError,
+    fetchMore: fetchMoreComments,
+    variables: commentsVariables,
   } = useCommentsQuery({
-    variables: { postId: postIdAsInt },
+    variables: {
+      postId: postIdAsInt,
+      limit: commentsPaginationLimit,
+      offset: commentsPaginationOffset,
+    },
   });
 
   if ((postLoading || commnentsLoading) && (!postData || !commentsData)) {
@@ -53,7 +64,7 @@ const Post: React.FC<{}> = () => {
     );
   }
 
-  deleteCommentCache();
+  // deleteCommentCache();
 
   return (
     <Layout>
@@ -78,6 +89,16 @@ const Post: React.FC<{}> = () => {
             meId={meData.me?.users[0].id}
           />
         )
+      )}
+      {!commentsData.comments.hasMore ? null : (
+        <FetchMore
+          limit={commentsPaginationLimit}
+          offset={commentsPaginationOffset}
+          fetchMore={fetchMoreComments}
+          variablesLimit={commentsVariables?.limit}
+          variablesOffset={commentsVariables?.offset}
+          setPaginationOffset={setCommentsPaginationOffset}
+        />
       )}
       {!meDataLoading && meData.me ? (
         <>

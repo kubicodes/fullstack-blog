@@ -1,10 +1,12 @@
-import { Button, Flex, Heading } from "@chakra-ui/react";
-import React, { useEffect, useState } from "react";
+import { Button, Heading } from "@chakra-ui/react";
+import NextLink from "next/link";
+import React, { useState } from "react";
 import BlogPost from "../components/BlogPost";
+import FetchMore from "../components/FetchMore";
 import { Layout } from "../components/Layout";
 import { useMeQuery, usePostsQuery } from "../generated/graphql";
+import { deleteCommentCache } from "../utils/deleteCommentCache";
 import { withApollo } from "../utils/withApollo";
-import NextLink from "next/link";
 
 const Index = () => {
   const paginationLimit = 5;
@@ -36,6 +38,9 @@ const Index = () => {
     return <div>Loading ....</div>;
   }
 
+  //to fix pagination cache issues on single post page and merging when pagination comments
+  deleteCommentCache();
+
   return (
     <Layout>
       <Heading as="h2" marginTop="5">
@@ -52,25 +57,14 @@ const Index = () => {
         <BlogPost key={post.id} blogPost={post} />
       ))}
       {!blogPosts.posts.hasMore ? null : (
-        <Flex>
-          <Button
-            colorScheme={"twitter"}
-            m={"auto"}
-            mt={8}
-            mb={8}
-            onClick={() => {
-              setPaginationOffset(paginationOffset + paginationLimit);
-              fetchMore({
-                variables: {
-                  limit: variables?.limit,
-                  offset: variables?.offset + paginationLimit,
-                },
-              });
-            }}
-          >
-            Fetch More
-          </Button>
-        </Flex>
+        <FetchMore
+          limit={paginationLimit}
+          offset={paginationOffset}
+          fetchMore={fetchMore}
+          variablesLimit={variables?.limit}
+          variablesOffset={variables?.offset}
+          setPaginationOffset={setPaginationOffset}
+        />
       )}
     </Layout>
   );
