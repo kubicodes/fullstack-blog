@@ -4,6 +4,7 @@ query Comments($postId: Int!, $limit: Int, $offset: Int) {
       ...CommentSnippet
     }
     hasMore
+    totalNumberOfComments
     errors {
       ...RegularErrorResponse
     }

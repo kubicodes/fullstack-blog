@@ -1,4 +1,4 @@
-import { Field, ObjectType } from "type-graphql";
+import { Field, Int, ObjectType } from "type-graphql";
 import { Post } from "../../entities/Post";
 import { FieldError } from "./FieldError";
 
@@ -6,6 +6,9 @@ import { FieldError } from "./FieldError";
 export class PostResponse {
   @Field(() => [Post], { nullable: true })
   posts?: Post[];
+
+  @Field(() => Int, { nullable: true })
+  totalNumberOfComments?: number;
 
   @Field(() => Boolean, { nullable: true })
   hasMore?: boolean;

@@ -70,7 +70,7 @@ const Post: React.FC<{}> = () => {
     <Layout>
       <BlogPost
         blogPost={postData.post.posts[0]}
-        comments={commentsData.comments?.comments}
+        totalNumberOfComments={commentsData.comments?.totalNumberOfComments}
       />
       <Divider />
       <Heading fontSize="large" mt={12}>
@@ -85,7 +85,7 @@ const Post: React.FC<{}> = () => {
           <CommentSection
             key={index}
             postId={post.id}
-            comments={commentsData.comments.comments}
+            comments={commentsData.comments?.comments}
             meId={meData.me?.users[0].id}
           />
         )

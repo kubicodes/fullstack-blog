@@ -10,18 +10,14 @@ import BlogArticle from "./BlogArticle";
 
 type BlogPostProps = {
   blogPost: BlogPostResponse | RegularPostResponseFragment;
-  comments?: CommentSnippetFragment[] | RegularErrorResponseFragment[];
+  totalNumberOfComments?: number;
 };
 
-const BlogPost: React.FC<BlogPostProps> = ({ blogPost, comments }) => {
-  let numberOfComments;
-
-  if (comments) {
-    numberOfComments = comments.length;
-  } else {
-    numberOfComments = blogPost?.comments.length;
-  }
-
+const BlogPost: React.FC<BlogPostProps> = ({
+  blogPost,
+  totalNumberOfComments,
+}) => {
+  const numberOfComments = totalNumberOfComments ?? blogPost.comments.length;
   return (
     <Stack spacing={8} mt={6}>
       <BlogArticle

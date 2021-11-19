@@ -32,6 +32,7 @@ export type CommentResponse = {
   comments?: Maybe<Array<Comment>>;
   errors?: Maybe<Array<FieldError>>;
   hasMore?: Maybe<Scalars['Boolean']>;
+  totalNumberOfComments: Scalars['Int'];
 };
 
 export type DeletePostResponse = {
@@ -313,7 +314,7 @@ export type CommentsQueryVariables = Exact<{
 }>;
 
 
-export type CommentsQuery = { __typename?: 'Query', comments: { __typename?: 'CommentResponse', hasMore?: boolean | null | undefined, comments?: Array<{ __typename?: 'Comment', id: number, body: string, postId: number, authorId: number, createdAt: any, updatedAt: any, author?: { __typename?: 'User', id: number, username: string } | null | undefined }> | null | undefined, errors?: Array<{ __typename?: 'FieldError', field?: string | null | undefined, message?: string | null | undefined }> | null | undefined } };
+export type CommentsQuery = { __typename?: 'Query', comments: { __typename?: 'CommentResponse', hasMore?: boolean | null | undefined, totalNumberOfComments: number, comments?: Array<{ __typename?: 'Comment', id: number, body: string, postId: number, authorId: number, createdAt: any, updatedAt: any, author?: { __typename?: 'User', id: number, username: string } | null | undefined }> | null | undefined, errors?: Array<{ __typename?: 'FieldError', field?: string | null | undefined, message?: string | null | undefined }> | null | undefined } };
 
 export type MeQueryVariables = Exact<{ [key: string]: never; }>;
 
@@ -776,6 +777,7 @@ export const CommentsDocument = gql`
       ...CommentSnippet
     }
     hasMore
+    totalNumberOfComments
     errors {
       ...RegularErrorResponse
     }

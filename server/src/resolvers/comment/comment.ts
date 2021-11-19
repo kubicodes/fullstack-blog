@@ -190,17 +190,23 @@ export class CommentResolver {
         .getMany();
 
       if (!result) {
-        return { comments: [] };
+        return { comments: [], totalNumberOfComments: 0 };
       }
+
+      const totalNumberOfComments = await fullResult.getCount();
 
       mapAuthorArrayToEntity(result);
 
       if (limit && offset !== undefined) {
         const hasMore = await calculateHasMore(limit, offset, fullResult);
-        return { comments: [...result], hasMore };
+        return {
+          comments: [...result],
+          hasMore,
+          totalNumberOfComments: totalNumberOfComments,
+        };
       }
 
-      return { comments: [...result] };
+      return { comments: [...result], totalNumberOfComments };
     } catch (error) {
       console.log(error);
 

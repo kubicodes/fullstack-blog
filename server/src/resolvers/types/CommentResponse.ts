@@ -1,4 +1,4 @@
-import { Field, ObjectType } from "type-graphql";
+import { Field, Int, ObjectType } from "type-graphql";
 import { Comment } from "../../entities/Comment";
 import { FieldError } from "./FieldError";
 
@@ -9,6 +9,9 @@ export class CommentResponse {
 
   @Field(() => Boolean, { nullable: true })
   hasMore?: boolean;
+
+  @Field(() => Int, { nullable: true })
+  totalNumberOfComments?: number;
 
   @Field(() => [FieldError], { nullable: true })
   errors?: FieldError[];
