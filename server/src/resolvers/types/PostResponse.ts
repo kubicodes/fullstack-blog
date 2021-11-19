@@ -7,9 +7,6 @@ export class PostResponse {
   @Field(() => [Post], { nullable: true })
   posts?: Post[];
 
-  @Field(() => Int, { nullable: true })
-  totalNumberOfComments?: number;
-
   @Field(() => Boolean, { nullable: true })
   hasMore?: boolean;
 

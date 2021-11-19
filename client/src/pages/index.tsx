@@ -4,7 +4,11 @@ import React, { useState } from "react";
 import BlogPost from "../components/BlogPost";
 import FetchMore from "../components/FetchMore";
 import { Layout } from "../components/Layout";
-import { useMeQuery, usePostsQuery } from "../generated/graphql";
+import {
+  useMeQuery,
+  usePostsQuery,
+  useTotalNumberOfCommentsQuery,
+} from "../generated/graphql";
 import { deleteCommentCache } from "../utils/deleteCommentCache";
 import { withApollo } from "../utils/withApollo";
 
@@ -40,6 +44,7 @@ const Index = () => {
 
   //to fix pagination cache issues on single post page and merging when pagination comments
   deleteCommentCache();
+
 
   return (
     <Layout>

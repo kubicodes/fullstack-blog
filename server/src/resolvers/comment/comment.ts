@@ -13,6 +13,7 @@ import { User } from "../../entities/User";
 import { isAuth } from "../../middleware/isAuth";
 import { CommentResponse } from "../types/CommentResponse";
 import { CustomContext } from "../types/CustomContext";
+import { FieldError } from "../types/FieldError";
 import { calculateHasMore } from "../utils/calculateHasMore";
 // import { calculateHasMore } from "../utils/calculateHasMore";
 import { mapAuthorArrayToEntity } from "../utils/mapAuthorArrayToEntity";
@@ -211,6 +212,29 @@ export class CommentResolver {
       console.log(error);
 
       return { errors: [{ message: "Internal Server Error" }] };
+    }
+  }
+
+  @Query(() => Int)
+  async totalNumberOfComments(
+    @Arg("postId", () => Int) postId: number
+  ): Promise<number> {
+    if (!postId) {
+      return 0;
+    }
+
+    try {
+      const matchedComments = await Comment.find({ where: { postId } });
+
+      if (!matchedComments) {
+        return 0;
+      }
+
+      return matchedComments.length;
+    } catch (error) {
+      console.log(error);
+
+      return 0;
     }
   }
 }

@@ -32,7 +32,7 @@ export type CommentResponse = {
   comments?: Maybe<Array<Comment>>;
   errors?: Maybe<Array<FieldError>>;
   hasMore?: Maybe<Scalars['Boolean']>;
-  totalNumberOfComments: Scalars['Int'];
+  totalNumberOfComments?: Maybe<Scalars['Int']>;
 };
 
 export type DeletePostResponse = {
@@ -158,6 +158,7 @@ export type Query = {
   posts: PostResponse;
   role: SingleRoleResponse;
   roles: RoleResponse;
+  totalNumberOfComments: Scalars['Int'];
 };
 
 
@@ -181,6 +182,11 @@ export type QueryPostsArgs = {
 
 export type QueryRoleArgs = {
   id: Scalars['Float'];
+};
+
+
+export type QueryTotalNumberOfCommentsArgs = {
+  postId: Scalars['Int'];
 };
 
 export type Role = {
@@ -236,7 +242,7 @@ export type PostSnippetFragment = { __typename?: 'Post', id: number, body: strin
 
 export type RegularErrorResponseFragment = { __typename?: 'FieldError', field?: string | null | undefined, message?: string | null | undefined };
 
-export type RegularPostResponseFragment = { __typename?: 'Post', id: number, body: string, headline: string, createdAt: any, updatedAt: any, author: { __typename?: 'User', id: number, email: string, username: string, createdAt: any, updatedAt: any }, comments?: Array<{ __typename?: 'Comment', id: number, body: string, postId: number, authorId: number, createdAt: any, updatedAt: any, author?: { __typename?: 'User', id: number, username: string } | null | undefined }> | null | undefined };
+export type RegularPostResponseFragment = { __typename?: 'Post', id: number, body: string, headline: string, createdAt: any, updatedAt: any, author: { __typename?: 'User', id: number, email: string, username: string, createdAt: any, updatedAt: any } };
 
 export type CreateCommentMutationVariables = Exact<{
   postId: Scalars['Int'];
@@ -252,7 +258,7 @@ export type CreatePostMutationVariables = Exact<{
 }>;
 
 
-export type CreatePostMutation = { __typename?: 'Mutation', createPost: { __typename?: 'PostResponse', posts?: Array<{ __typename?: 'Post', id: number, body: string, headline: string, createdAt: any, updatedAt: any, author: { __typename?: 'User', id: number, email: string, username: string, createdAt: any, updatedAt: any }, comments?: Array<{ __typename?: 'Comment', id: number, body: string, postId: number, authorId: number, createdAt: any, updatedAt: any, author?: { __typename?: 'User', id: number, username: string } | null | undefined }> | null | undefined }> | null | undefined, errors?: Array<{ __typename?: 'FieldError', field?: string | null | undefined, message?: string | null | undefined }> | null | undefined } };
+export type CreatePostMutation = { __typename?: 'Mutation', createPost: { __typename?: 'PostResponse', posts?: Array<{ __typename?: 'Post', id: number, body: string, headline: string, createdAt: any, updatedAt: any, author: { __typename?: 'User', id: number, email: string, username: string, createdAt: any, updatedAt: any } }> | null | undefined, errors?: Array<{ __typename?: 'FieldError', field?: string | null | undefined, message?: string | null | undefined }> | null | undefined } };
 
 export type DeleteCommentMutationVariables = Exact<{
   commentId: Scalars['Int'];
@@ -314,7 +320,7 @@ export type CommentsQueryVariables = Exact<{
 }>;
 
 
-export type CommentsQuery = { __typename?: 'Query', comments: { __typename?: 'CommentResponse', hasMore?: boolean | null | undefined, totalNumberOfComments: number, comments?: Array<{ __typename?: 'Comment', id: number, body: string, postId: number, authorId: number, createdAt: any, updatedAt: any, author?: { __typename?: 'User', id: number, username: string } | null | undefined }> | null | undefined, errors?: Array<{ __typename?: 'FieldError', field?: string | null | undefined, message?: string | null | undefined }> | null | undefined } };
+export type CommentsQuery = { __typename?: 'Query', comments: { __typename?: 'CommentResponse', hasMore?: boolean | null | undefined, totalNumberOfComments?: number | null | undefined, comments?: Array<{ __typename?: 'Comment', id: number, body: string, postId: number, authorId: number, createdAt: any, updatedAt: any, author?: { __typename?: 'User', id: number, username: string } | null | undefined }> | null | undefined, errors?: Array<{ __typename?: 'FieldError', field?: string | null | undefined, message?: string | null | undefined }> | null | undefined } };
 
 export type MeQueryVariables = Exact<{ [key: string]: never; }>;
 
@@ -326,7 +332,7 @@ export type PostQueryVariables = Exact<{
 }>;
 
 
-export type PostQuery = { __typename?: 'Query', post: { __typename?: 'PostResponse', posts?: Array<{ __typename?: 'Post', id: number, body: string, headline: string, createdAt: any, updatedAt: any, author: { __typename?: 'User', id: number, email: string, username: string, createdAt: any, updatedAt: any }, comments?: Array<{ __typename?: 'Comment', id: number, body: string, postId: number, authorId: number, createdAt: any, updatedAt: any, author?: { __typename?: 'User', id: number, username: string } | null | undefined }> | null | undefined }> | null | undefined, errors?: Array<{ __typename?: 'FieldError', field?: string | null | undefined, message?: string | null | undefined }> | null | undefined } };
+export type PostQuery = { __typename?: 'Query', post: { __typename?: 'PostResponse', posts?: Array<{ __typename?: 'Post', id: number, body: string, headline: string, createdAt: any, updatedAt: any, author: { __typename?: 'User', id: number, email: string, username: string, createdAt: any, updatedAt: any } }> | null | undefined, errors?: Array<{ __typename?: 'FieldError', field?: string | null | undefined, message?: string | null | undefined }> | null | undefined } };
 
 export type PostsQueryVariables = Exact<{
   limit?: Maybe<Scalars['Int']>;
@@ -334,7 +340,7 @@ export type PostsQueryVariables = Exact<{
 }>;
 
 
-export type PostsQuery = { __typename?: 'Query', posts: { __typename?: 'PostResponse', hasMore?: boolean | null | undefined, posts?: Array<{ __typename?: 'Post', id: number, body: string, headline: string, createdAt: any, updatedAt: any, author: { __typename?: 'User', id: number, email: string, username: string, createdAt: any, updatedAt: any }, comments?: Array<{ __typename?: 'Comment', id: number, body: string, postId: number, authorId: number, createdAt: any, updatedAt: any, author?: { __typename?: 'User', id: number, username: string } | null | undefined }> | null | undefined }> | null | undefined, errors?: Array<{ __typename?: 'FieldError', field?: string | null | undefined, message?: string | null | undefined }> | null | undefined } };
+export type PostsQuery = { __typename?: 'Query', posts: { __typename?: 'PostResponse', hasMore?: boolean | null | undefined, posts?: Array<{ __typename?: 'Post', id: number, body: string, headline: string, createdAt: any, updatedAt: any, author: { __typename?: 'User', id: number, email: string, username: string, createdAt: any, updatedAt: any } }> | null | undefined, errors?: Array<{ __typename?: 'FieldError', field?: string | null | undefined, message?: string | null | undefined }> | null | undefined } };
 
 export type PostWithAuthorQueryVariables = Exact<{
   postId: Scalars['Int'];
@@ -348,6 +354,27 @@ export type RolesQueryVariables = Exact<{ [key: string]: never; }>;
 
 export type RolesQuery = { __typename?: 'Query', roles: { __typename?: 'RoleResponse', roles?: Array<{ __typename?: 'Role', id: number, title: string }> | null | undefined, errors?: Array<{ __typename?: 'FieldError', field?: string | null | undefined, message?: string | null | undefined }> | null | undefined } };
 
+export type TotalNumberOfCommentsQueryVariables = Exact<{
+  postId: Scalars['Int'];
+}>;
+
+
+export type TotalNumberOfCommentsQuery = { __typename?: 'Query', totalNumberOfComments: number };
+
+export const CommentSnippetFragmentDoc = gql`
+    fragment CommentSnippet on Comment {
+  id
+  body
+  postId
+  authorId
+  author {
+    id
+    username
+  }
+  createdAt
+  updatedAt
+}
+    `;
 export const RegularErrorResponseFragmentDoc = gql`
     fragment RegularErrorResponse on FieldError {
   field
@@ -373,33 +400,15 @@ export const AuthorSnippetFragmentDoc = gql`
   updatedAt
 }
     `;
-export const CommentSnippetFragmentDoc = gql`
-    fragment CommentSnippet on Comment {
-  id
-  body
-  postId
-  authorId
-  author {
-    id
-    username
-  }
-  createdAt
-  updatedAt
-}
-    `;
 export const RegularPostResponseFragmentDoc = gql`
     fragment RegularPostResponse on Post {
   ...PostSnippet
   author {
     ...AuthorSnippet
   }
-  comments {
-    ...CommentSnippet
-  }
 }
     ${PostSnippetFragmentDoc}
-${AuthorSnippetFragmentDoc}
-${CommentSnippetFragmentDoc}`;
+${AuthorSnippetFragmentDoc}`;
 export const CreateCommentDocument = gql`
     mutation CreateComment($postId: Int!, $body: String!) {
   createComment(postId: $postId, body: $body) {
@@ -1025,3 +1034,36 @@ export function useRolesLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<Role
 export type RolesQueryHookResult = ReturnType<typeof useRolesQuery>;
 export type RolesLazyQueryHookResult = ReturnType<typeof useRolesLazyQuery>;
 export type RolesQueryResult = Apollo.QueryResult<RolesQuery, RolesQueryVariables>;
+export const TotalNumberOfCommentsDocument = gql`
+    query TotalNumberOfComments($postId: Int!) {
+  totalNumberOfComments(postId: $postId)
+}
+    `;
+
+/**
+ * __useTotalNumberOfCommentsQuery__
+ *
+ * To run a query within a React component, call `useTotalNumberOfCommentsQuery` and pass it any options that fit your needs.
+ * When your component renders, `useTotalNumberOfCommentsQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useTotalNumberOfCommentsQuery({
+ *   variables: {
+ *      postId: // value for 'postId'
+ *   },
+ * });
+ */
+export function useTotalNumberOfCommentsQuery(baseOptions: Apollo.QueryHookOptions<TotalNumberOfCommentsQuery, TotalNumberOfCommentsQueryVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<TotalNumberOfCommentsQuery, TotalNumberOfCommentsQueryVariables>(TotalNumberOfCommentsDocument, options);
+      }
+export function useTotalNumberOfCommentsLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<TotalNumberOfCommentsQuery, TotalNumberOfCommentsQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<TotalNumberOfCommentsQuery, TotalNumberOfCommentsQueryVariables>(TotalNumberOfCommentsDocument, options);
+        }
+export type TotalNumberOfCommentsQueryHookResult = ReturnType<typeof useTotalNumberOfCommentsQuery>;
+export type TotalNumberOfCommentsLazyQueryHookResult = ReturnType<typeof useTotalNumberOfCommentsLazyQuery>;
+export type TotalNumberOfCommentsQueryResult = Apollo.QueryResult<TotalNumberOfCommentsQuery, TotalNumberOfCommentsQueryVariables>;

@@ -1,10 +1,11 @@
-import { Field, ObjectType } from "type-graphql";
+import { Field, Int, ObjectType } from "type-graphql";
 import {
   BaseEntity,
   Column,
   CreateDateColumn,
-  Entity, PrimaryGeneratedColumn,
-  UpdateDateColumn
+  Entity,
+  PrimaryGeneratedColumn,
+  UpdateDateColumn,
 } from "typeorm";
 import { Comment } from "./Comment";
 import { User } from "./User";

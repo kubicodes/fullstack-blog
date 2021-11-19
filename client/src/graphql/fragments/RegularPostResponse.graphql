@@ -3,7 +3,4 @@ fragment RegularPostResponse on Post {
   author {
     ...AuthorSnippet
   }
-  comments {
-    ...CommentSnippet
-  }
 }

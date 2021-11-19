@@ -13,7 +13,7 @@ import {
   useMeQuery,
   usePostWithAuthorQuery,
 } from "../../generated/graphql";
-import { deleteCommentCache } from "../../utils/deleteCommentCache";
+import { deleteCommentAndPostCache } from "../../utils/deleteCommentCache";
 import { withApollo } from "../../utils/withApollo";
 
 const Post: React.FC<{}> = () => {

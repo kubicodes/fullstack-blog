@@ -1,28 +1,36 @@
 import { Stack } from "@chakra-ui/layout";
 import React from "react";
 import {
-  CommentSnippetFragment,
-  RegularErrorResponseFragment,
   RegularPostResponseFragment,
+  useTotalNumberOfCommentsQuery,
 } from "../generated/graphql";
 import { BlogPostResponse } from "../types/BlogPostResponse";
 import BlogArticle from "./BlogArticle";
 
 type BlogPostProps = {
   blogPost: BlogPostResponse | RegularPostResponseFragment;
-  totalNumberOfComments?: number;
 };
 
-const BlogPost: React.FC<BlogPostProps> = ({
-  blogPost,
-  totalNumberOfComments,
-}) => {
-  const numberOfComments = totalNumberOfComments ?? blogPost.comments.length;
+const getTotalNumberOfComments = (postId: number): number => {
+  const { data, loading } = useTotalNumberOfCommentsQuery({
+    variables: { postId },
+  });
+
+  if (!loading && !data) {
+    return 0;
+  }
+
+  if (!loading && data) {
+    return data.totalNumberOfComments;
+  }
+};
+
+const BlogPost: React.FC<BlogPostProps> = ({ blogPost }) => {
   return (
     <Stack spacing={8} mt={6}>
       <BlogArticle
         id={blogPost.id}
-        numberOfComments={numberOfComments}
+        numberOfComments={getTotalNumberOfComments(blogPost.id)}
         headline={blogPost.headline}
         body={blogPost.body}
         author={blogPost.author.username}

@@ -1,0 +1,3 @@
+query TotalNumberOfComments($postId: Int!) {
+  totalNumberOfComments(postId: $postId)
+}

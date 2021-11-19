@@ -23,13 +23,23 @@ const CreateComment: React.FC<CreateCommentProps> = ({
   const [createComment] = useCreateCommentMutation();
 
   const handleSubmit = async (values: SubmitValues, { setErrors }) => {
-    let cacheDeleteResult;
+    let commentsCacheDeleteResult;
+    let postCacheDeleteResult;
+    let totalNumberOfCommentsCacheDeleteResult;
+
     const { data } = await createComment({
       variables: { postId, body: values.body },
       update: (cache) => {
-        console.log(cache);
-        cacheDeleteResult = cache.evict({
+        commentsCacheDeleteResult = cache.evict({
           fieldName: "comments",
+        });
+
+        postCacheDeleteResult = cache.evict({
+          fieldName: `post({"postId":${postId}})`,
+        });
+
+        totalNumberOfCommentsCacheDeleteResult = cache.evict({
+          fieldName: `totalNumberOfComments({"postId":${postId}})`,
         });
       },
     });
@@ -42,7 +52,11 @@ const CreateComment: React.FC<CreateCommentProps> = ({
       setErrors(formikFormattedErrors);
     }
 
-    if (cacheDeleteResult) {
+    if (
+      commentsCacheDeleteResult &&
+      postCacheDeleteResult &&
+      totalNumberOfCommentsCacheDeleteResult
+    ) {
       values.body = "";
       setShow(false);
     }

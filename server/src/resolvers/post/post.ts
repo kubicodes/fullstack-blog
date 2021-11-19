@@ -17,7 +17,6 @@ import { DeletePostResponse } from "../types/DeletePostResponse";
 import { PostResponse } from "../types/PostResponse";
 import { UserResponse } from "../types/UserResponse";
 import { calculateHasMore } from "../utils/calculateHasMore";
-// import { calculateHasMore } from "../utils/calculateHasMore";
 import { mapAuthorArrayToEntity } from "../utils/mapAuthorArrayToEntity";
 import { useIsBodyValid } from "./utils/useIsBodyValid";
 import { useIsHeadlineValid } from "./utils/useIsHeadlineValid";
