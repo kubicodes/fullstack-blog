@@ -1,0 +1,14 @@
+query PostWithAuthor($postId: Int!) {
+  post(postId: $postId) {
+    posts {
+      id
+      headline
+      body
+      createdAt
+      updatedAt
+      author {
+        ...AuthorSnippet
+      }
+    }
+  }
+}

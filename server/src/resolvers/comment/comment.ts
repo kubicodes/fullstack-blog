@@ -1,10 +1,19 @@
-import { Arg, Ctx, Int, Mutation, Resolver, UseMiddleware } from "type-graphql";
+import {
+  Arg,
+  Ctx,
+  Int,
+  Mutation,
+  Query,
+  Resolver,
+  UseMiddleware,
+} from "type-graphql";
 import { getConnection } from "typeorm";
 import { Comment } from "../../entities/Comment";
 import { User } from "../../entities/User";
 import { isAuth } from "../../middleware/isAuth";
 import { CommentResponse } from "../types/CommentResponse";
 import { CustomContext } from "../types/CustomContext";
+import { mapAuthorArrayToEntity } from "../utils/mapAuthorArrayToEntity";
 
 @Resolver(Comment)
 export class CommentResolver {
@@ -144,6 +153,44 @@ export class CommentResolver {
         comments: [{ ...updatedComment }] as any,
       };
     } catch (error) {
+      return { errors: [{ message: "Internal Server Error" }] };
+    }
+  }
+
+  @Query(() => CommentResponse)
+  async comments(
+    @Arg("postId", () => Int, { nullable: true }) postId?: number
+  ): Promise<CommentResponse> {
+    if (!postId) {
+      return {
+        errors: [{ field: "postId", message: "Post ID cannot be empty" }],
+      };
+    }
+
+    try {
+      const result = await getConnection()
+        .getRepository(Comment)
+        .createQueryBuilder("comment")
+        .leftJoinAndMapMany(
+          "comment.author",
+          User,
+          "user",
+          "comment.authorId=user.id"
+        )
+        .where("`comment`.`postId`=:postId", { postId })
+        .orderBy("comment.createdAt", "DESC")
+        .getMany();
+
+      mapAuthorArrayToEntity(result);
+
+      if (!result) {
+        return { comments: [] };
+      }
+
+      return { comments: [...result] };
+    } catch (error) {
+      console.log(error);
+
       return { errors: [{ message: "Internal Server Error" }] };
     }
   }

@@ -1,13 +1,26 @@
 import { Stack } from "@chakra-ui/layout";
 import React from "react";
-import { RegularPostResponseFragment } from "../generated/graphql";
+import {
+  CommentSnippetFragment,
+  RegularErrorResponseFragment,
+  RegularPostResponseFragment,
+} from "../generated/graphql";
+import { BlogPostResponse } from "../types/BlogPostResponse";
 import BlogArticle from "./BlogArticle";
 
 type BlogPostProps = {
-  blogPost: RegularPostResponseFragment;
+  blogPost: BlogPostResponse | RegularPostResponseFragment;
+  comments?: CommentSnippetFragment[] | RegularErrorResponseFragment[];
 };
-const BlogPost: React.FC<BlogPostProps> = ({ blogPost }) => {
-  const numberOfComments = blogPost.comments?.length ?? 0;
+
+const BlogPost: React.FC<BlogPostProps> = ({ blogPost, comments }) => {
+  let numberOfComments;
+
+  if (comments) {
+    numberOfComments = comments.length;
+  } else {
+    numberOfComments = blogPost?.comments.length;
+  }
 
   return (
     <Stack spacing={8} mt={6}>

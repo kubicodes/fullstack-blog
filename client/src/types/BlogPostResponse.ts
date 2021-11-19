@@ -4,12 +4,12 @@ import {
 } from "../generated/graphql";
 
 export interface BlogPostResponse {
-  __typename: string;
+  __typename?: string;
   id: number;
   headline: string;
   body: string;
-  createdAt: Date;
-  updatedAt: Date;
+  createdAt: string;
+  updatedAt: string;
   author: AuthorSnippetFragment;
-  comments: CommentSnippetFragment;
+  comments?: CommentSnippetFragment[];
 }

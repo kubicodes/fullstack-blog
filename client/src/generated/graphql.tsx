@@ -150,11 +150,17 @@ export type PostResponse = {
 
 export type Query = {
   __typename?: 'Query';
+  comments: CommentResponse;
   me?: Maybe<UserResponse>;
   post: PostResponse;
   posts: PostResponse;
   role: SingleRoleResponse;
   roles: RoleResponse;
+};
+
+
+export type QueryCommentsArgs = {
+  postId?: Maybe<Scalars['Int']>;
 };
 
 
@@ -297,6 +303,13 @@ export type UpdatePostMutationVariables = Exact<{
 
 export type UpdatePostMutation = { __typename?: 'Mutation', updatePost: { __typename?: 'PostResponse', posts?: Array<{ __typename?: 'Post', id: number, headline: string, body: string, createdAt: any, updatedAt: any }> | null | undefined, errors?: Array<{ __typename?: 'FieldError', field?: string | null | undefined, message?: string | null | undefined }> | null | undefined } };
 
+export type CommentsQueryVariables = Exact<{
+  postId: Scalars['Int'];
+}>;
+
+
+export type CommentsQuery = { __typename?: 'Query', comments: { __typename?: 'CommentResponse', comments?: Array<{ __typename?: 'Comment', id: number, body: string, postId: number, authorId: number, createdAt: any, updatedAt: any, author?: { __typename?: 'User', id: number, username: string } | null | undefined }> | null | undefined, errors?: Array<{ __typename?: 'FieldError', field?: string | null | undefined, message?: string | null | undefined }> | null | undefined } };
+
 export type MeQueryVariables = Exact<{ [key: string]: never; }>;
 
 
@@ -316,6 +329,13 @@ export type PostsQueryVariables = Exact<{
 
 
 export type PostsQuery = { __typename?: 'Query', posts: { __typename?: 'PostResponse', hasMore?: boolean | null | undefined, posts?: Array<{ __typename?: 'Post', id: number, body: string, headline: string, createdAt: any, updatedAt: any, author: { __typename?: 'User', id: number, email: string, username: string, createdAt: any, updatedAt: any }, comments?: Array<{ __typename?: 'Comment', id: number, body: string, postId: number, authorId: number, createdAt: any, updatedAt: any, author?: { __typename?: 'User', id: number, username: string } | null | undefined }> | null | undefined }> | null | undefined, errors?: Array<{ __typename?: 'FieldError', field?: string | null | undefined, message?: string | null | undefined }> | null | undefined } };
+
+export type PostWithAuthorQueryVariables = Exact<{
+  postId: Scalars['Int'];
+}>;
+
+
+export type PostWithAuthorQuery = { __typename?: 'Query', post: { __typename?: 'PostResponse', posts?: Array<{ __typename?: 'Post', id: number, headline: string, body: string, createdAt: any, updatedAt: any, author: { __typename?: 'User', id: number, email: string, username: string, createdAt: any, updatedAt: any } }> | null | undefined } };
 
 export type RolesQueryVariables = Exact<{ [key: string]: never; }>;
 
@@ -744,6 +764,47 @@ export function useUpdatePostMutation(baseOptions?: Apollo.MutationHookOptions<U
 export type UpdatePostMutationHookResult = ReturnType<typeof useUpdatePostMutation>;
 export type UpdatePostMutationResult = Apollo.MutationResult<UpdatePostMutation>;
 export type UpdatePostMutationOptions = Apollo.BaseMutationOptions<UpdatePostMutation, UpdatePostMutationVariables>;
+export const CommentsDocument = gql`
+    query Comments($postId: Int!) {
+  comments(postId: $postId) {
+    comments {
+      ...CommentSnippet
+    }
+    errors {
+      ...RegularErrorResponse
+    }
+  }
+}
+    ${CommentSnippetFragmentDoc}
+${RegularErrorResponseFragmentDoc}`;
+
+/**
+ * __useCommentsQuery__
+ *
+ * To run a query within a React component, call `useCommentsQuery` and pass it any options that fit your needs.
+ * When your component renders, `useCommentsQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useCommentsQuery({
+ *   variables: {
+ *      postId: // value for 'postId'
+ *   },
+ * });
+ */
+export function useCommentsQuery(baseOptions: Apollo.QueryHookOptions<CommentsQuery, CommentsQueryVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<CommentsQuery, CommentsQueryVariables>(CommentsDocument, options);
+      }
+export function useCommentsLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<CommentsQuery, CommentsQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<CommentsQuery, CommentsQueryVariables>(CommentsDocument, options);
+        }
+export type CommentsQueryHookResult = ReturnType<typeof useCommentsQuery>;
+export type CommentsLazyQueryHookResult = ReturnType<typeof useCommentsLazyQuery>;
+export type CommentsQueryResult = Apollo.QueryResult<CommentsQuery, CommentsQueryVariables>;
 export const MeDocument = gql`
     query Me {
   me {
@@ -869,6 +930,50 @@ export function usePostsLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<Post
 export type PostsQueryHookResult = ReturnType<typeof usePostsQuery>;
 export type PostsLazyQueryHookResult = ReturnType<typeof usePostsLazyQuery>;
 export type PostsQueryResult = Apollo.QueryResult<PostsQuery, PostsQueryVariables>;
+export const PostWithAuthorDocument = gql`
+    query PostWithAuthor($postId: Int!) {
+  post(postId: $postId) {
+    posts {
+      id
+      headline
+      body
+      createdAt
+      updatedAt
+      author {
+        ...AuthorSnippet
+      }
+    }
+  }
+}
+    ${AuthorSnippetFragmentDoc}`;
+
+/**
+ * __usePostWithAuthorQuery__
+ *
+ * To run a query within a React component, call `usePostWithAuthorQuery` and pass it any options that fit your needs.
+ * When your component renders, `usePostWithAuthorQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = usePostWithAuthorQuery({
+ *   variables: {
+ *      postId: // value for 'postId'
+ *   },
+ * });
+ */
+export function usePostWithAuthorQuery(baseOptions: Apollo.QueryHookOptions<PostWithAuthorQuery, PostWithAuthorQueryVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<PostWithAuthorQuery, PostWithAuthorQueryVariables>(PostWithAuthorDocument, options);
+      }
+export function usePostWithAuthorLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<PostWithAuthorQuery, PostWithAuthorQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<PostWithAuthorQuery, PostWithAuthorQueryVariables>(PostWithAuthorDocument, options);
+        }
+export type PostWithAuthorQueryHookResult = ReturnType<typeof usePostWithAuthorQuery>;
+export type PostWithAuthorLazyQueryHookResult = ReturnType<typeof usePostWithAuthorLazyQuery>;
+export type PostWithAuthorQueryResult = Apollo.QueryResult<PostWithAuthorQuery, PostWithAuthorQueryVariables>;
 export const RolesDocument = gql`
     query Roles {
   roles {

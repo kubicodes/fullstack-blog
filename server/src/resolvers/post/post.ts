@@ -5,7 +5,7 @@ import {
   Mutation,
   Query,
   Resolver,
-  UseMiddleware,
+  UseMiddleware
 } from "type-graphql";
 import { getConnection } from "typeorm";
 import { Comment } from "../../entities/Comment";
@@ -26,8 +26,6 @@ export class PostResolver {
     @Arg("limit", () => Int, { nullable: true }) limit?: number,
     @Arg("offset", () => Int, { nullable: true }) offset?: number
   ): Promise<PostResponse> {
-    console.log("limit ", limit);
-    console.log("offset ", offset);
     try {
       let allPosts: Post[] = [];
       const fullResult = await getConnection()

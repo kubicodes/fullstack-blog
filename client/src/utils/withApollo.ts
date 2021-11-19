@@ -1,7 +1,7 @@
 import { ApolloClient, InMemoryCache } from "@apollo/client";
 import { NextPageContext } from "next";
 import { withApollo as createWithApollo } from "next-apollo";
-import { Post, PostResponse } from "../generated/graphql";
+import { CommentResponse, Post, PostResponse } from "../generated/graphql";
 
 const client = (ctx: NextPageContext) =>
   new ApolloClient({
@@ -25,6 +25,21 @@ const client = (ctx: NextPageContext) =>
                 return {
                   ...incoming,
                   posts: [...(existing?.posts || []), ...incoming.posts],
+                };
+              },
+            },
+            comments: {
+              keyArgs: [],
+              merge(
+                existing: CommentResponse | undefined,
+                incoming: CommentResponse
+              ): CommentResponse {
+                return {
+                  ...incoming,
+                  comments: [
+                    ...(existing?.comments || []),
+                    ...incoming.comments,
+                  ],
                 };
               },
             },

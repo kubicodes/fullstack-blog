@@ -6,43 +6,75 @@ import BlogPost from "../../components/BlogPost";
 import CommentSection from "../../components/CommentSection";
 import CreateComment from "../../components/CreateComment";
 import { Layout } from "../../components/Layout";
-import { useMeQuery, usePostQuery } from "../../generated/graphql";
+import {
+  useCommentsQuery,
+  useMeQuery,
+  usePostWithAuthorQuery,
+} from "../../generated/graphql";
+import { deleteCommentCache } from "../../utils/deleteCommentCache";
 import { withApollo } from "../../utils/withApollo";
 
-const Post = () => {
+const Post: React.FC<{}> = () => {
+  const [showCommentSection, setShowCommentSection] = useState(false);
+
   const router = useRouter();
   const postId = router.query.id;
   const postIdAsInt = parseInt(postId as string);
   const { data: meData, loading: meDataLoading } = useMeQuery();
-  const [showCommentSection, setShowCommentSection] = useState(false);
 
-  const { data, loading, error } = usePostQuery({
+  const {
+    data: postData,
+    loading: postLoading,
+    error: postError,
+  } = usePostWithAuthorQuery({ variables: { postId: postIdAsInt } });
+
+  const {
+    data: commentsData,
+    loading: commnentsLoading,
+    error: commentsError,
+  } = useCommentsQuery({
     variables: { postId: postIdAsInt },
   });
 
-  if (loading && !data) {
+  if ((postLoading || commnentsLoading) && (!postData || !commentsData)) {
     return <div>Loading ....</div>;
   }
 
-  if (!loading && !data && error) {
-    return <div>{error}</div>;
+  if (
+    (!postLoading || !commnentsLoading) &&
+    (!postData || !commentsData) &&
+    (postError || commentsError)
+  ) {
+    return (
+      <>
+        <div>{postError ?? postError}</div>
+        <div>{commentsError ?? commentsError}</div>
+      </>
+    );
   }
+
+  deleteCommentCache();
 
   return (
     <Layout>
-      <BlogPost blogPost={data.post.posts[0]} />
+      <BlogPost
+        blogPost={postData.post.posts[0]}
+        comments={commentsData.comments?.comments}
+      />
       <Divider />
       <Heading fontSize="large" mt={12}>
         Comments
       </Heading>
-      {data.post.posts.map((post, index) =>
-        !post.comments.length ? (
-          <Text mt={5}>There are no comments yet</Text>
+      {postData.post.posts.map((post, index) =>
+        !commentsData.comments.comments.length ? (
+          <Text key={index} mt={5}>
+            There are no comments yet
+          </Text>
         ) : (
           <CommentSection
             key={index}
             postId={post.id}
-            comments={post.comments}
+            comments={commentsData.comments.comments}
             meId={meData.me?.users[0].id}
           />
         )

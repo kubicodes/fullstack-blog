@@ -1,0 +1,10 @@
+query Comments($postId: Int!) {
+  comments(postId: $postId) {
+    comments {
+      ...CommentSnippet
+    }
+    errors {
+      ...RegularErrorResponse
+    }
+  }
+}
