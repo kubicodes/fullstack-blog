@@ -4,10 +4,7 @@ import React, { useState } from "react";
 import BlogPost from "../components/BlogPost";
 import FetchMore from "../components/FetchMore";
 import { Layout } from "../components/Layout";
-import {
-  useMeQuery,
-  usePostsQuery
-} from "../generated/graphql";
+import { useMeQuery, usePostsQuery } from "../generated/graphql";
 import { deleteCommentCache } from "../utils/deleteCommentCache";
 import { withApollo } from "../utils/withApollo";
 
@@ -77,4 +74,4 @@ const Index = () => {
   );
 };
 
-export default withApollo({ ssr: false })(Index);
+export default withApollo({ ssr: true })(Index);
