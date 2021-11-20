@@ -1,4 +1,4 @@
-import { Button, Heading } from "@chakra-ui/react";
+import { Button, Heading, Text } from "@chakra-ui/react";
 import NextLink from "next/link";
 import React, { useState } from "react";
 import BlogPost from "../components/BlogPost";
@@ -6,8 +6,7 @@ import FetchMore from "../components/FetchMore";
 import { Layout } from "../components/Layout";
 import {
   useMeQuery,
-  usePostsQuery,
-  useTotalNumberOfCommentsQuery,
+  usePostsQuery
 } from "../generated/graphql";
 import { deleteCommentCache } from "../utils/deleteCommentCache";
 import { withApollo } from "../utils/withApollo";
@@ -31,20 +30,23 @@ const Index = () => {
   const { data: meData } = useMeQuery();
   if (!loading && !blogPosts) {
     return (
-      <>
-        <div>There was an error</div>
-        <div>{error.message}</div>
-      </>
+      <Layout>
+        <Text>There was an error</Text>
+        <Text>{error.message}</Text>
+      </Layout>
     );
   }
 
   if (loading && !blogPosts) {
-    return <div>Loading ....</div>;
+    return (
+      <Layout>
+        <Text>Loading ....</Text>
+      </Layout>
+    );
   }
 
   //to fix pagination cache issues on single post page and merging when pagination comments
   deleteCommentCache();
-
 
   return (
     <Layout>
@@ -75,4 +77,4 @@ const Index = () => {
   );
 };
 
-export default withApollo({ ssr: true })(Index);
+export default withApollo({ ssr: false })(Index);

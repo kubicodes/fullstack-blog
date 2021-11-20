@@ -1,4 +1,3 @@
-import { useApolloClient } from "@apollo/client";
 import { Button } from "@chakra-ui/button";
 import { Box, Divider, Heading, Text } from "@chakra-ui/layout";
 import { useRouter } from "next/dist/client/router";
@@ -13,7 +12,6 @@ import {
   useMeQuery,
   usePostWithAuthorQuery,
 } from "../../generated/graphql";
-import { deleteCommentAndPostCache } from "../../utils/deleteCommentCache";
 import { withApollo } from "../../utils/withApollo";
 
 const Post: React.FC<{}> = () => {
@@ -48,7 +46,11 @@ const Post: React.FC<{}> = () => {
   });
 
   if ((postLoading || commnentsLoading) && (!postData || !commentsData)) {
-    return <div>Loading ....</div>;
+    return (
+      <Layout>
+        <Text>Loading ....</Text>
+      </Layout>
+    );
   }
 
   if (
@@ -57,21 +59,16 @@ const Post: React.FC<{}> = () => {
     (postError || commentsError)
   ) {
     return (
-      <>
-        <div>{postError ?? postError}</div>
-        <div>{commentsError ?? commentsError}</div>
-      </>
+      <Layout>
+        <Text>{postError ?? postError}</Text>
+        <Text>{commentsError ?? commentsError}</Text>
+      </Layout>
     );
   }
 
-  // deleteCommentCache();
-
   return (
     <Layout>
-      <BlogPost
-        blogPost={postData.post.posts[0]}
-        totalNumberOfComments={commentsData.comments?.totalNumberOfComments}
-      />
+      <BlogPost blogPost={postData.post.posts[0]} />
       <Divider />
       <Heading fontSize="large" mt={12}>
         Comments
