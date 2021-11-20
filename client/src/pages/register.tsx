@@ -29,6 +29,9 @@ const Register = () => {
         username: values.username,
         password: values.password,
       },
+      update: (cache) => {
+        cache.evict({ fieldName: "me" });
+      },
     });
 
     if (response.data?.register.errors) {

@@ -29,8 +29,6 @@ export const NavBar = () => {
       <Flex align="center">
         <Box mr={2}>{data.me.users[0].username}</Box>
         <Button
-          // variant="link"
-          colorScheme={"black"}
           bgColor={"yellow.300"}
           onClick={async () => {
             await logout({});

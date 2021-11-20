@@ -104,7 +104,7 @@ const Register = () => {
                       label="Password"
                     />
                     <Button
-                      colorScheme="twitter"
+                      colorScheme="teal"
                       width="full"
                       mt={4}
                       type="submit"
