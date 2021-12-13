@@ -4,36 +4,17 @@ import cors from "cors";
 import "dotenv-safe/config";
 import express from "express";
 import session from "express-session";
-import { buildSchema } from "type-graphql";
 import Redis from "ioredis";
-import path from "path";
+import { buildSchema } from "type-graphql";
 import { createConnection } from "typeorm";
 import { COOKIE_NAME, __prod__ } from "./constants";
-import { Role } from "./entities/Role";
-import { User } from "./entities/User";
+import { CommentResolver } from "./resolvers/comment/comment";
+import { PostResolver } from "./resolvers/post/post";
 import { RoleResolver } from "./resolvers/role/role";
 import { UserResolver } from "./resolvers/user/user";
-import { Post } from "./entities/Post";
-import { Comment } from "./entities/Comment";
-import { PostResolver } from "./resolvers/post/post";
-import { CommentResolver } from "./resolvers/comment/comment";
 
 const main = async () => {
-  const connection = await createConnection({
-    type: "mysql",
-    host: process.env.DATABASE_HOST,
-    port: parseInt(process.env.DATABASE_PORT),
-    username: process.env.DATABASE_USERNAME,
-    password: process.env.DATABASE_PASSWORD,
-    database: process.env.DATABASE_NAME,
-    logging: true,
-    synchronize: false,
-    entities: [User, Role, Post, Comment],
-    migrations: [path.join(__dirname, "./migrations/*")],
-    extra: {
-      namedPlaceholders: true,
-    },
-  });
+  const connection = await createConnection();
 
   await connection.runMigrations();
 
