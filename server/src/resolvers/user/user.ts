@@ -2,7 +2,7 @@ import { Arg, Ctx, Int, Mutation, Query, Resolver } from "type-graphql";
 import { User } from "../../entities/User";
 import { CustomContext } from "../types/CustomContext";
 import { UserResponse } from "../types/UserResponse";
-import argon2 from "argon2";
+import bcrypt from "bcrypt";
 import { Role } from "../../entities/Role";
 import { isEmailValid } from "../utils/validation/validateEmail";
 import { isPasswordValid } from "../utils/validation/validatePassword";
@@ -43,7 +43,7 @@ export class UserResolver {
       };
     }
 
-    const hashedPassword = await argon2.hash(password);
+    const hashedPassword = await bcrypt.hash(password, 10);
 
     if (!hashedPassword) {
       return {
@@ -129,7 +129,7 @@ export class UserResolver {
       };
     }
 
-    const isPasswordValid = await argon2.verify(
+    const isPasswordValid = await bcrypt.compare(
       matchedUser.password,
       loginOptions.password
     );

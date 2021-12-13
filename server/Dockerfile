@@ -9,7 +9,6 @@ WORKDIR /usr/src/app
 COPY package.json ./
 COPY yarn.lock ./
 
-RUN yarn add argon2 --build-from-source
 RUN yarn
 
 COPY .env.production .env
