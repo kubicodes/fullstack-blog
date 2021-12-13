@@ -5,36 +5,46 @@ import React, { useEffect } from "react";
 import InputField from "../components/InputField";
 import { Wrapper } from "../components/Wrapper";
 import {
+  MeDocument,
+  MeQuery,
   useMeQuery,
   useRegisterMutation,
   useRolesQuery,
+  UserResponse,
+  UserType,
 } from "../generated/graphql";
 import { errorMap } from "../utils/errorMap";
 import { withApollo } from "../utils/withApollo";
 
 const Register = () => {
   const [register] = useRegisterMutation();
-  const { data: rolesData } = useRolesQuery();
   const router = useRouter();
   const { data: meQueryData, loading } = useMeQuery();
 
   const handleSubmit = async (values, { setErrors }) => {
-    const authorRole = rolesData?.roles?.roles?.find(
-      (role) => role.title === "author"
-    );
     const response = await register({
       variables: {
-        role: authorRole!.id,
         email: values.email,
         username: values.username,
         password: values.password,
       },
-      update: (cache) => {
-        cache.evict({ fieldName: "me" });
+      update: (cache, { data }) => {
+        console.log(data?.register);
+        cache.writeQuery<MeQuery>({
+          query: MeDocument,
+          data: {
+            __typename: "Query",
+            me: {
+              __typename: "UserResponse",
+              user: data?.register?.users[0],
+            },
+          },
+        });
       },
     });
 
     if (response.data?.register.errors) {
+      console.log(response.data?.register.errors);
       const formikFormattedErrors = errorMap(response.data.register.errors);
       setErrors(formikFormattedErrors);
     } else {
@@ -57,7 +67,7 @@ const Register = () => {
       >
         {({ isSubmitting }) => (
           <Form>
-            {!loading && !meQueryData?.me?.users ? (
+            {!loading && !meQueryData?.me?.user ? (
               <Flex width="Full" align="center" justifyContent="center">
                 <Box
                   p={8}
@@ -67,7 +77,7 @@ const Register = () => {
                   boxShadow="lg"
                 >
                   <Box textAlign="center">
-                    <Heading> Login </Heading>
+                    <Heading> Register </Heading>
                   </Box>
                   <Box my={4} textAlign="left">
                     <InputField

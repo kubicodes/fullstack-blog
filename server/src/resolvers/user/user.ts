@@ -17,7 +17,7 @@ export class UserResolver {
     @Arg("username") username: string,
     @Arg("email") email: string,
     @Arg("password") password: string,
-    @Arg("role", () => Int) roleId: number,
+    @Arg("role", () => Int, { nullable: true }) roleId: number,
     @Ctx() { req }: CustomContext
   ): Promise<UserResponse> {
     if (!isEmailValid(email)) {
@@ -46,6 +46,7 @@ export class UserResolver {
     const hashedPassword = await bcrypt.hash(password, 10);
 
     if (!hashedPassword) {
+      console.log("angekommen");
       return {
         errors: [{ message: "Internal Server Error. Try again later" }],
       };
@@ -57,7 +58,6 @@ export class UserResolver {
         username,
         email,
         password: hashedPassword,
-        role_id: roleId,
       }).save();
     } catch (error) {
       if (error.code === "ER_DUP_ENTRY") {
@@ -82,21 +82,12 @@ export class UserResolver {
       };
     }
 
-    const matchedRole = await Role.findOne(roleId);
-
-    if (!matchedRole) {
-      return {
-        errors: [{ field: "role", message: "Invalid Role" }],
-      };
-    }
-
     req.session.userId = createdUser.id;
 
     return {
       users: [
         {
           ...createdUser,
-          role: matchedRole?.title,
         },
       ],
     };
@@ -184,11 +175,9 @@ export class UserResolver {
     }
 
     return {
-      users: [
-        {
-          ...matchedUser,
-        },
-      ],
+      user: {
+        ...matchedUser,
+      },
     };
   }
 }

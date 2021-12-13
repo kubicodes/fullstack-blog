@@ -91,7 +91,7 @@ const BlogArticle: React.FC<BlogArticle> = ({
               </Text>
             </Flex>
             <BlogAuthor name={author} date={new Date(`${createdAt}`)} />
-            {meDataLoading || meData.me?.users[0].id !== authorId ? null : (
+            {meDataLoading || meData.me?.user.id !== authorId ? null : (
               <DeleteAndEditButtons
                 handleDelete={handleDelete}
                 linkHref={"/post/edit/[id]"}

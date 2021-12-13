@@ -38,11 +38,9 @@ const Register = () => {
             data: {
               __typename: "Query",
               me: {
-                users: [
-                  {
-                    ...userData,
-                  },
-                ],
+                user: {
+                  ...userData,
+                },
               },
             },
           });
@@ -76,7 +74,7 @@ const Register = () => {
       >
         {({ isSubmitting }) => (
           <Form>
-            {!loading && !meQueryData?.me?.users ? (
+            {!loading && !meQueryData?.me?.user ? (
               <Flex width="Full" align="center" justifyContent="center">
                 <Box
                   p={8}

@@ -24,10 +24,10 @@ export const NavBar = () => {
         </NextLink>
       </>
     );
-  } else if (data.me.users) {
+  } else if (data.me.user) {
     body = (
       <Flex align="center">
-        <Box mr={2}>{data.me.users[0].username}</Box>
+        <Box mr={2}>{data.me.user.username}</Box>
         <Button
           bgColor={"yellow.300"}
           onClick={async () => {

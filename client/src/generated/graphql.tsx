@@ -109,7 +109,7 @@ export type MutationLoginArgs = {
 export type MutationRegisterArgs = {
   email: Scalars['String'];
   password: Scalars['String'];
-  role: Scalars['Int'];
+  role?: Maybe<Scalars['Int']>;
   username: Scalars['String'];
 };
 
@@ -220,6 +220,7 @@ export type User = {
 export type UserResponse = {
   __typename?: 'UserResponse';
   errors?: Maybe<Array<FieldError>>;
+  user?: Maybe<UserType>;
   users?: Maybe<Array<UserType>>;
 };
 
@@ -287,7 +288,6 @@ export type LogoutMutationVariables = Exact<{ [key: string]: never; }>;
 export type LogoutMutation = { __typename?: 'Mutation', logout: boolean };
 
 export type RegisterMutationVariables = Exact<{
-  role: Scalars['Int'];
   password: Scalars['String'];
   email: Scalars['String'];
   username: Scalars['String'];
@@ -325,7 +325,7 @@ export type CommentsQuery = { __typename?: 'Query', comments: { __typename?: 'Co
 export type MeQueryVariables = Exact<{ [key: string]: never; }>;
 
 
-export type MeQuery = { __typename?: 'Query', me?: { __typename?: 'UserResponse', users?: Array<{ __typename?: 'UserType', id: number, username: string, email: string, role_id: number, createdAt: any, updatedAt: any }> | null | undefined } | null | undefined };
+export type MeQuery = { __typename?: 'Query', me?: { __typename?: 'UserResponse', user?: { __typename?: 'UserType', id: number, username: string, email: string, createdAt: any, updatedAt: any } | null | undefined } | null | undefined };
 
 export type PostQueryVariables = Exact<{
   postId: Scalars['Int'];
@@ -640,8 +640,8 @@ export type LogoutMutationHookResult = ReturnType<typeof useLogoutMutation>;
 export type LogoutMutationResult = Apollo.MutationResult<LogoutMutation>;
 export type LogoutMutationOptions = Apollo.BaseMutationOptions<LogoutMutation, LogoutMutationVariables>;
 export const RegisterDocument = gql`
-    mutation Register($role: Int!, $password: String!, $email: String!, $username: String!) {
-  register(role: $role, password: $password, email: $email, username: $username) {
+    mutation Register($password: String!, $email: String!, $username: String!) {
+  register(password: $password, email: $email, username: $username) {
     users {
       id
       email
@@ -671,7 +671,6 @@ export type RegisterMutationFn = Apollo.MutationFunction<RegisterMutation, Regis
  * @example
  * const [registerMutation, { data, loading, error }] = useRegisterMutation({
  *   variables: {
- *      role: // value for 'role'
  *      password: // value for 'password'
  *      email: // value for 'email'
  *      username: // value for 'username'
@@ -827,11 +826,10 @@ export type CommentsQueryResult = Apollo.QueryResult<CommentsQuery, CommentsQuer
 export const MeDocument = gql`
     query Me {
   me {
-    users {
+    user {
       id
       username
       email
-      role_id
       createdAt
       updatedAt
     }

@@ -3,8 +3,9 @@ import {
   BaseEntity,
   Column,
   CreateDateColumn,
-  Entity, PrimaryGeneratedColumn,
-  UpdateDateColumn
+  Entity,
+  PrimaryGeneratedColumn,
+  UpdateDateColumn,
 } from "typeorm";
 import { Post } from "./Post";
 
@@ -25,9 +26,6 @@ export class User extends BaseEntity {
 
   @Column()
   password!: string;
-
-  @Column()
-  role_id!: number;
 
   @Field(() => [Post], { nullable: true })
   posts?: Post[];

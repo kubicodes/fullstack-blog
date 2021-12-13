@@ -83,7 +83,7 @@ const Post: React.FC<{}> = () => {
             key={index}
             postId={post.id}
             comments={commentsData.comments?.comments}
-            meId={meData.me?.users[0].id}
+            meId={meData.me?.user.id}
           />
         )
       )}

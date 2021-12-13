@@ -1,10 +1,9 @@
 query Me {
   me {
-    users {
+    user {
       id
       username
       email
-      role_id
       createdAt
       updatedAt
     }
