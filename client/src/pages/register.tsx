@@ -8,10 +8,7 @@ import {
   MeDocument,
   MeQuery,
   useMeQuery,
-  useRegisterMutation,
-  useRolesQuery,
-  UserResponse,
-  UserType,
+  useRegisterMutation
 } from "../generated/graphql";
 import { errorMap } from "../utils/errorMap";
 import { withApollo } from "../utils/withApollo";
@@ -29,22 +26,22 @@ const Register = () => {
         password: values.password,
       },
       update: (cache, { data }) => {
-        console.log(data?.register);
-        cache.writeQuery<MeQuery>({
-          query: MeDocument,
-          data: {
-            __typename: "Query",
-            me: {
-              __typename: "UserResponse",
-              user: data?.register?.users[0],
+        if (!data?.register.errors) {
+          cache.writeQuery<MeQuery>({
+            query: MeDocument,
+            data: {
+              __typename: "Query",
+              me: {
+                __typename: "UserResponse",
+                user: data?.register?.users[0],
+              },
             },
-          },
-        });
+          });
+        }
       },
     });
 
     if (response.data?.register.errors) {
-      console.log(response.data?.register.errors);
       const formikFormattedErrors = errorMap(response.data.register.errors);
       setErrors(formikFormattedErrors);
     } else {
