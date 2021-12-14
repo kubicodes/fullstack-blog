@@ -1,14 +1,13 @@
+import bcrypt from "bcrypt";
 import { Arg, Ctx, Int, Mutation, Query, Resolver } from "type-graphql";
+import { COOKIE_NAME } from "../../constants";
 import { User } from "../../entities/User";
 import { CustomContext } from "../types/CustomContext";
+import { LoginOptions } from "../types/LoginOptions";
 import { UserResponse } from "../types/UserResponse";
-import bcrypt from "bcrypt";
-import { Role } from "../../entities/Role";
+import { capitalizeFirstLetter } from "../utils/capitalizeFirstLetter";
 import { isEmailValid } from "../utils/validation/validateEmail";
 import { isPasswordValid } from "../utils/validation/validatePassword";
-import { LoginOptions } from "../types/LoginOptions";
-import { COOKIE_NAME } from "../../constants";
-import { capitalizeFirstLetter } from "../utils/capitalizeFirstLetter";
 
 @Resolver(User)
 export class UserResolver {
@@ -46,7 +45,6 @@ export class UserResolver {
     const hashedPassword = await bcrypt.hash(password, 10);
 
     if (!hashedPassword) {
-      console.log("angekommen");
       return {
         errors: [{ message: "Internal Server Error. Try again later" }],
       };
@@ -121,8 +119,8 @@ export class UserResolver {
     }
 
     const isPasswordValid = await bcrypt.compare(
-      matchedUser.password,
-      loginOptions.password
+      loginOptions.password,
+      matchedUser.password
     );
 
     if (!isPasswordValid) {

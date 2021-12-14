@@ -7,7 +7,10 @@
     "gen-env": "gen-env-types .env -o src/env.d.ts -e .",
     "watch": "tsc -w",
     "build": "tsc",
-    "dev": "nodemon dist/index.js"
+    "dev": "nodemon dist/index.js",
+    "heroku-container-login": "heroku container:login",
+    "heroku-push": "heroku container:push web -a api-fullstack-blog-kubicodes",
+    "heroku-release": "heroku container:release web -a api-fullstack-blog-kubicodes"
   },
   "devDependencies": {
     "@types/bcrypt": "^5.0.0",
