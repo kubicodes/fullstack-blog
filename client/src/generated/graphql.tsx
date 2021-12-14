@@ -280,7 +280,7 @@ export type LoginMutationVariables = Exact<{
 }>;
 
 
-export type LoginMutation = { __typename?: 'Mutation', login: { __typename?: 'UserResponse', users?: Array<{ __typename?: 'UserType', id: number, email: string, username: string, role_id: number, createdAt: any, updatedAt: any }> | null | undefined, errors?: Array<{ __typename?: 'FieldError', field?: string | null | undefined, message?: string | null | undefined }> | null | undefined } };
+export type LoginMutation = { __typename?: 'Mutation', login: { __typename?: 'UserResponse', users?: Array<{ __typename?: 'UserType', id: number, email: string, username: string, createdAt: any, updatedAt: any }> | null | undefined, errors?: Array<{ __typename?: 'FieldError', field?: string | null | undefined, message?: string | null | undefined }> | null | undefined } };
 
 export type LogoutMutationVariables = Exact<{ [key: string]: never; }>;
 
@@ -572,7 +572,6 @@ export const LoginDocument = gql`
       id
       email
       username
-      role_id
       createdAt
       updatedAt
     }
