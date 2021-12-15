@@ -8,7 +8,7 @@ import {
   MeDocument,
   MeQuery,
   useMeQuery,
-  useRegisterMutation
+  useRegisterMutation,
 } from "../generated/graphql";
 import { errorMap } from "../utils/errorMap";
 import { withApollo } from "../utils/withApollo";
@@ -105,7 +105,7 @@ const Register = () => {
                       type="submit"
                       isLoading={isSubmitting}
                     >
-                      'Sign In'
+                      Sign Up
                     </Button>
                   </Box>
                 </Box>

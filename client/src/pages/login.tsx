@@ -108,7 +108,7 @@ const Register = () => {
                       type="submit"
                       isLoading={isSubmitting}
                     >
-                      'Sign In'
+                      Sign In
                     </Button>
                   </Box>
                 </Box>

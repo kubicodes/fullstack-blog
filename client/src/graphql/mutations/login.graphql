@@ -4,7 +4,6 @@ mutation Login($loginOptions: LoginOptions!) {
       id
       email
       username
-      role_id
       createdAt
       updatedAt
     }
